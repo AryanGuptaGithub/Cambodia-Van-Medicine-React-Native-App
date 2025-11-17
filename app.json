@@ -1,15 +1,19 @@
 {
   "expo": {
-    "name": "Movie_App",
+    "name": "Healthcare_Van",
     "slug": "Movie_App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "movieapp",
+    "icon": "./assets/images/Healthcare_Van.png",
+    "scheme": "healthcarevan",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aryangupta1520.healthcarevan",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,14 +23,14 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.aryangupta1520.healthcarevan"
     },
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-
       [
         "expo-splash-screen",
         {
@@ -41,8 +45,13 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": false,
+      "reactCompiler": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f1b190b9-2167-436c-ad00-b25554c16971"
+      }
     }
   }
 }

@@ -1,100 +1,100 @@
-// src/api/_api.js
-// Replace baseUrl and functions to match your backend API (MongoDB + Express etc).
-// const baseUrl = 'https://your-backend.example.com/api'; // <- replace
+// // src/api/_api.js
+// // Replace baseUrl and functions to match your backend API (MongoDB + Express etc).
+// // const baseUrl = 'https://your-backend.example.com/api'; // <- replace
+// //
+// // export async function fetchCustomers() {
+// //     // try {
+// //     //     const res = await fetch(`${baseUrl}/customers`);
+// //     //     if (!res.ok) throw new Error('fetchCustomers failed');
+// //     //     return res.json();
+// //     // } catch (err) {
+// //     //     console.log('fetchCustomers', err.message);
+// //     //     return null;
+// //     // }
+// //
+// // //this is a dummy return
+// //     return [
+// //         {id: 1, name: 'John Doe', address: '123 Main St'},
+// //         {id: 2, name: 'Jane Smith', address: '456 Market St'},
+// //     ]
+// //
+// // }
+// //
+// // export async function fetchProducts() {
+// //     // try {
+// //     //     const res = await fetch(`${baseUrl}/products`);
+// //     //     if (!res.ok) throw new Error('fetchProducts failed');
+// //     //     return res.json();
+// //     // } catch (err) {
+// //     //     console.log('fetchProducts', err.message);
+// //     //     return null;
+// //     // }
+// //
+// //     //this is a dummy return
+// //     return [
+// //         {id: 1, name: 'Product A', price: 10},
+// //         {id: 2, name: 'Product B', price: 20},
+// //     ];
+// // }
+// //
+// // export async function createCustomer(customer) {
+// //     // try {
+// //     //     const res = await fetch(`${baseUrl}/customers`, {
+// //     //         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(customer)
+// //     //     });
+// //     //     if (!res.ok) throw new Error('createCustomer failed');
+// //     //     return res.json();
+// //     // } catch (err) {
+// //     //     console.log('createCustomer', err.message);
+// //     //     throw err;
+// //     // }
+// //
+// //     //this is a dummy return
+// //     // Just simulate successful creation
+// //     console.log('createCustomer called', customer);
+// //     return {...customer, id: Date.now()};
+// //
+// // }
+// //
+// // export async function createProduct(product) {
+// //     // try {
+// //     //     const res = await fetch(`${baseUrl}/products`, {
+// //     //         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(product)
+// //     //     });
+// //     //     if (!res.ok) throw new Error('createProduct failed');
+// //     //     return res.json();
+// //     // } catch (err) {
+// //     //     console.log('createProduct', err.message);
+// //     //     throw err;
+// //     // }
+// //
+// //     //this is a dummy return
+// //     // Simulate successful creation
+// //     console.log('createProduct called', product);
+// //     return {...product, id: Date.now()};
+// //
+// // }
+// //
+// // export async function createSale(sale) {
+// //     // try {
+// //     //     const res = await fetch(`${baseUrl}/sales`, {
+// //     //         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(sale)
+// //     //     });
+// //     //     if (!res.ok) throw new Error('createSale failed');
+// //     //     return res.json();
+// //     // } catch (err) {
+// //     //     console.log('createSale', err.message);
+// //     //     throw err;
+// //     // }
+// //
+// //     //this is a dummy return
+// //     // Simulate successful creation
+// //     console.log('createSale called', sale);
+// //     return {...sale, id: Date.now()};
+// //
+// // }
 //
-// export async function fetchCustomers() {
-//     // try {
-//     //     const res = await fetch(`${baseUrl}/customers`);
-//     //     if (!res.ok) throw new Error('fetchCustomers failed');
-//     //     return res.json();
-//     // } catch (err) {
-//     //     console.log('fetchCustomers', err.message);
-//     //     return null;
-//     // }
 //
-// //this is a dummy return
-//     return [
-//         {id: 1, name: 'John Doe', address: '123 Main St'},
-//         {id: 2, name: 'Jane Smith', address: '456 Market St'},
-//     ]
-//
-// }
-//
-// export async function fetchProducts() {
-//     // try {
-//     //     const res = await fetch(`${baseUrl}/products`);
-//     //     if (!res.ok) throw new Error('fetchProducts failed');
-//     //     return res.json();
-//     // } catch (err) {
-//     //     console.log('fetchProducts', err.message);
-//     //     return null;
-//     // }
-//
-//     //this is a dummy return
-//     return [
-//         {id: 1, name: 'Product A', price: 10},
-//         {id: 2, name: 'Product B', price: 20},
-//     ];
-// }
-//
-// export async function createCustomer(customer) {
-//     // try {
-//     //     const res = await fetch(`${baseUrl}/customers`, {
-//     //         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(customer)
-//     //     });
-//     //     if (!res.ok) throw new Error('createCustomer failed');
-//     //     return res.json();
-//     // } catch (err) {
-//     //     console.log('createCustomer', err.message);
-//     //     throw err;
-//     // }
-//
-//     //this is a dummy return
-//     // Just simulate successful creation
-//     console.log('createCustomer called', customer);
-//     return {...customer, id: Date.now()};
-//
-// }
-//
-// export async function createProduct(product) {
-//     // try {
-//     //     const res = await fetch(`${baseUrl}/products`, {
-//     //         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(product)
-//     //     });
-//     //     if (!res.ok) throw new Error('createProduct failed');
-//     //     return res.json();
-//     // } catch (err) {
-//     //     console.log('createProduct', err.message);
-//     //     throw err;
-//     // }
-//
-//     //this is a dummy return
-//     // Simulate successful creation
-//     console.log('createProduct called', product);
-//     return {...product, id: Date.now()};
-//
-// }
-//
-// export async function createSale(sale) {
-//     // try {
-//     //     const res = await fetch(`${baseUrl}/sales`, {
-//     //         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(sale)
-//     //     });
-//     //     if (!res.ok) throw new Error('createSale failed');
-//     //     return res.json();
-//     // } catch (err) {
-//     //     console.log('createSale', err.message);
-//     //     throw err;
-//     // }
-//
-//     //this is a dummy return
-//     // Simulate successful creation
-//     console.log('createSale called', sale);
-//     return {...sale, id: Date.now()};
-//
-// }
-
-
 // src/api/_api.js
 // Replace baseUrl and functions to match your backend API (MongoDB + Express etc).
 const baseUrl = 'https://your-backend.example.com/api'; // <- replace when ready
@@ -336,3 +336,34 @@ export async function createSale(sale) {
     console.log('createSale called', sale);
     return {...sale, id: String(Date.now())};
 }
+
+//
+// // src/api/_api.js
+// export async function fetchCustomers() {
+//     return [
+//         {id: 1, name: 'John Doe', address: '123 Main St'},
+//         {id: 2, name: 'Jane Smith', address: '456 Market St'},
+//     ];
+// }
+//
+// export async function fetchProducts() {
+//     return [
+//         {id: 1, name: 'Product A', price: 10, stock: 10},
+//         {id: 2, name: 'Product B', price: 20, stock: 20},
+//     ];
+// }
+//
+// export async function createCustomer(c) {
+//     console.log('dummy createCustomer', c);
+//     return c;
+// }
+//
+// export async function createProduct(p) {
+//     console.log('dummy createProduct', p);
+//     return p;
+// }
+//
+// export async function createSale(s) {
+//     console.log('dummy createSale', s);
+//     return s;
+// }

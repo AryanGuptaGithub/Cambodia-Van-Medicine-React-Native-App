@@ -216,3 +216,57 @@ function NavButton({label, icon, onPress}) {
         </TouchableOpacity>
     );
 }
+
+
+// // src/screens/HomeScreen.js
+// import React, {useContext} from 'react';
+// import {Text, TouchableOpacity, View} from 'react-native';
+// import {_AppContext} from '../context/_AppContext';
+//
+// export default function HomeScreen({navigation}) {
+//     const {customers, products} = useContext(_AppContext);
+//
+//     return (
+//         <View style={{flex: 1, backgroundColor: '#eef2ff', padding: 16}}>
+//             {/* Header */}
+//             <View style={{backgroundColor: '#334155', borderRadius: 16, padding: 16, marginBottom: 12}}>
+//                 <Text style={{color: '#fff', fontSize: 20, fontWeight: '700'}}>Van Sales Manager</Text>
+//                 <Text style={{color: '#c7d2fe', marginTop: 4}}>Medical Representative - MR001</Text>
+//             </View>
+//
+//             {/* Buttons (we’ll wire routes next) */}
+//             <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between'}}>
+//                 <SquareBtn label="Customers" onPress={() => navigation.navigate('Customers')}/>
+//                 <SquareBtn label="New Sale" onPress={() => navigation.navigate('Sales')}/>
+//                 <SquareBtn label="Products" onPress={() => navigation.navigate('Products')}/>
+//                 <SquareBtn label="Returns" onPress={() => navigation.navigate('Returns')}/>
+//                 <SquareBtn label="Payroll" onPress={() => navigation.navigate('Payroll')}/>
+//                 <SquareBtn label="Attendance" onPress={() => navigation.navigate('Attendance')}/>
+//             </View>
+//
+//             {/* Stats */}
+//             <View style={{marginTop: 16}}>
+//                 <Text style={{fontWeight: '700'}}>Stats</Text>
+//                 <Text>Customers: {customers.length} • Products: {products.length}</Text>
+//             </View>
+//         </View>
+//     );
+// }
+//
+// function SquareBtn({label, onPress}) {
+//     return (
+//         <TouchableOpacity
+//             onPress={onPress}
+//             style={{
+//                 width: '48%',
+//                 backgroundColor: '#fff',
+//                 padding: 14,
+//                 borderRadius: 12,
+//                 marginBottom: 12,
+//                 elevation: 2,
+//             }}
+//         >
+//             <Text style={{fontWeight: '700'}}>{label}</Text>
+//         </TouchableOpacity>
+//     );
+// }
