@@ -41,6 +41,7 @@ export default function CustomersScreen({navigation}) {
         });
     }, [customers, search, typeFilter]);
 
+
     const renderItem = ({item}) => (
         <View
             style={{
@@ -52,7 +53,9 @@ export default function CustomersScreen({navigation}) {
                 borderColor: '#e5e7eb',
             }}
         >
-            <Text style={{fontWeight: '700', fontSize: 16}}>{item.name}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('CustomerDetails', {customer: item})}>
+                <Text style={{fontWeight: '700', fontSize: 16}}>{item.name}</Text>
+            </TouchableOpacity>
 
             <Text style={{color: '#6b7280', marginTop: 4}}>
                 {(item.agent || 'Unknown type') +
@@ -60,31 +63,26 @@ export default function CustomersScreen({navigation}) {
                     (item.province ? ` • ${item.province}` : '')}
             </Text>
 
-            {item.medRep ? (
+            {item.medRep && (
                 <Text style={{marginTop: 4, fontSize: 12, color: '#4b5563'}}>
                     Med Rep: <Text style={{fontWeight: '600'}}>{item.medRep}</Text>
                 </Text>
-            ) : null}
+            )}
 
-            {item.phone ? (
+            {item.phone && (
                 <Text style={{fontSize: 12, color: '#4b5563'}}>
                     Phone: <Text style={{fontWeight: '600'}}>{item.phone}</Text>
                 </Text>
-            ) : null}
+            )}
 
-            {typeof item.outstanding === 'number' ? (
-                <Text
-                    style={{
-                        marginTop: 8,
-                        fontWeight: '700',
-                        color: '#b91c1c',
-                    }}
-                >
+            {typeof item.outstanding === 'number' && (
+                <Text style={{marginTop: 8, fontWeight: '700', color: '#b91c1c'}}>
                     Outstanding: ${item.outstanding}
                 </Text>
-            ) : null}
+            )}
         </View>
     );
+
 
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#f8fafc'}}>

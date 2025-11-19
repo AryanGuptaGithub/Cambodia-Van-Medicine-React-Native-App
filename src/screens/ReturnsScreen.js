@@ -6,7 +6,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {_AppContext} from '../context/_AppContext';
 import Header from '../../components/jsfiles/Header';
 import CustomerPicker from '../../components/jsfiles/CustomerPicker';
-import ProductPicker from '../../components/jsfiles/ProductPicker';
+import {ProductPicker} from '../../components/jsfiles/ProductPicker';
 
 export default function ReturnsScreen({navigation}) {
     const {customers, products, incrementStock} = useContext(_AppContext);

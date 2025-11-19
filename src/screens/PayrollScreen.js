@@ -41,11 +41,7 @@ export default function PayrollScreen({navigation}) {
                         value={`+$${commission.toFixed(2)}`}
                         valueColor="#16a34a"
                     />
-                    <Row
-                        label="Bonuses"
-                        value={`+$${bonuses.toFixed(2)}`}
-                        valueColor="#16a34a"
-                    />
+                   
                     <Row
                         label="Deductions"
                         value={`-$${deductions.toFixed(2)}`}

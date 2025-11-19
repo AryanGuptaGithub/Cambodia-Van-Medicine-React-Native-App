@@ -23,9 +23,9 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-
 import MainStack from './src/navigation/MainStack';
 import {AppProvider} from './src/context/_AppContext';
+import Toast from 'react-native-toast-message';
 
 export default function App() {
     return (
@@ -34,7 +34,10 @@ export default function App() {
                 <NavigationContainer>
                     <MainStack/>
                 </NavigationContainer>
+
             </AppProvider>
+
+            <Toast/>
         </SafeAreaProvider>
     );
 }

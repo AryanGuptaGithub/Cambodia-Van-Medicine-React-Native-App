@@ -1,4 +1,4 @@
-// components/CustomerPicker.js
+// components/jsfiles/CustomerPicker.js
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Modal, SectionList, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';

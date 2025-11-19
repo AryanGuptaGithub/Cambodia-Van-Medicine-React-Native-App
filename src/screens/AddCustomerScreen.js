@@ -127,13 +127,13 @@ export default function AddCustomerScreen({navigation}) {
                     </View>
                 </View>
 
-                <LabeledInput
-                    label="Outstanding Balance (USD)"
-                    value={form.outstanding}
-                    onChange={(v) => updateField('outstanding', v)}
-                    keyboardType="numeric"
-                    placeholder="0.00"
-                />
+                {/*<LabeledInput*/}
+                {/*    label="Outstanding Balance (USD)"*/}
+                {/*    value={form.outstanding}*/}
+                {/*    onChange={(v) => updateField('outstanding', v)}*/}
+                {/*    keyboardType="numeric"*/}
+                {/*    placeholder="0.00"*/}
+                {/*/>*/}
 
                 <LabeledInput
                     label="Remark"

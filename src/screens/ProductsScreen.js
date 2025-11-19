@@ -88,12 +88,12 @@ export default function ProductsScreen({navigation}) {
                     <View style={{alignItems: 'flex-end'}}>
                         <Text style={{fontSize: 12, color: '#6b7280'}}>Selling</Text>
                         <Text style={{fontWeight: '700'}}>${item.sellingPrice}</Text>
-                        <Text style={{fontSize: 12, color: '#6b7280', marginTop: 4}}>
-                            Purchase
-                        </Text>
-                        <Text style={{fontWeight: '600', fontSize: 12}}>
-                            ${item.purchasingPrice}
-                        </Text>
+                        {/*<Text style={{fontSize: 12, color: '#6b7280', marginTop: 4}}>*/}
+                        {/*    Purchase*/}
+                        {/*</Text>*/}
+                        {/*<Text style={{fontWeight: '600', fontSize: 12}}>*/}
+                        {/*    ${item.purchasingPrice}*/}
+                        {/*</Text>*/}
                     </View>
                 </View>
 

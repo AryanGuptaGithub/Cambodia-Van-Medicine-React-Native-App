@@ -68,10 +68,28 @@ export default function HomeScreen({navigation}) {
                     marginHorizontal: 20,
                     marginBottom: 20
                 }}>
-                    <StatsCard label="Customers" value={customers.length} icon="account-group"/>
-                    <StatsCard label="Products" value={products.length} icon="package-variant"/>
-                    <StatsCard label="Sales" value="1200" icon="cash-multiple"/>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('CustomersScreen')}
+                        style={{flex: 1, marginRight: 10}}  // Adjust spacing as needed
+                    >
+                        <StatsCard label="Customers" value={customers.length} icon="account-group"/>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('ProductsScreen')}
+                        style={{flex: 1, marginHorizontal: 5}}
+                    >
+                        <StatsCard label="Products" value={products.length} icon="package-variant"/>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('SalesScreen')}
+                        style={{flex: 1, marginLeft: 10}}
+                    >
+                        <StatsCard label="Sales" value="1200" icon="cash-multiple"/>
+                    </TouchableOpacity>
                 </View>
+
 
                 {/* Mini Sales Chart */}
                 <View style={{marginHorizontal: 20, marginBottom: 20}}>
@@ -164,7 +182,7 @@ export default function HomeScreen({navigation}) {
                     shadowOpacity: 0.1,
                     shadowRadius: 4
                 }}
-                onPress={() => navigation.navigate('NewSale')}>
+                onPress={() => navigation.navigate('Sales')}>
                 <Icon name="plus" size={28} color="#fff"/>
             </TouchableOpacity>
 

@@ -38,59 +38,59 @@ export default function AttendanceScreen({navigation}) {
 
             <View style={{flex: 1, padding: 12}}>
                 {/* Today Check-in Card */}
-                <View
-                    style={{
-                        backgroundColor: '#e0f2fe',
-                        borderRadius: 12,
-                        padding: 16,
-                        marginBottom: 12,
-                    }}
-                >
-                    <Text
-                        style={{
-                            textAlign: 'center',
-                            fontWeight: '700',
-                            color: '#0f172a',
-                            marginBottom: 6,
-                        }}
-                    >
-                        Today's Check-in
-                    </Text>
-                    <Text
-                        style={{
-                            textAlign: 'center',
-                            color: '#64748b',
-                            marginBottom: 10,
-                        }}
-                    >
-                        {todayStr}
-                    </Text>
-                    <Text
-                        style={{
-                            textAlign: 'center',
-                            fontSize: 32,
-                            fontWeight: '700',
-                            color: '#1d4ed8',
-                            marginBottom: 12,
-                        }}
-                    >
-                        {checkedInTime || '-- : --'}
-                    </Text>
-                    <TouchableOpacity
-                        onPress={onCheckIn}
-                        style={{
-                            alignSelf: 'center',
-                            backgroundColor: '#16a34a',
-                            paddingVertical: 10,
-                            paddingHorizontal: 24,
-                            borderRadius: 999,
-                        }}
-                    >
-                        <Text style={{color: '#fff', fontWeight: '700'}}>
-                            {checkedInTime ? 'Checked In' : 'Check In Now'}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+                {/*<View*/}
+                {/*    style={{*/}
+                {/*        backgroundColor: '#e0f2fe',*/}
+                {/*        borderRadius: 12,*/}
+                {/*        padding: 16,*/}
+                {/*        marginBottom: 12,*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    <Text*/}
+                {/*        style={{*/}
+                {/*            textAlign: 'center',*/}
+                {/*            fontWeight: '700',*/}
+                {/*            color: '#0f172a',*/}
+                {/*            marginBottom: 6,*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        Today's Check-in*/}
+                {/*    </Text>*/}
+                {/*    <Text*/}
+                {/*        style={{*/}
+                {/*            textAlign: 'center',*/}
+                {/*            color: '#64748b',*/}
+                {/*            marginBottom: 10,*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        {todayStr}*/}
+                {/*    </Text>*/}
+                {/*    <Text*/}
+                {/*        style={{*/}
+                {/*            textAlign: 'center',*/}
+                {/*            fontSize: 32,*/}
+                {/*            fontWeight: '700',*/}
+                {/*            color: '#1d4ed8',*/}
+                {/*            marginBottom: 12,*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        {checkedInTime || '-- : --'}*/}
+                {/*    </Text>*/}
+                {/*    <TouchableOpacity*/}
+                {/*        onPress={onCheckIn}*/}
+                {/*        style={{*/}
+                {/*            alignSelf: 'center',*/}
+                {/*            backgroundColor: '#16a34a',*/}
+                {/*            paddingVertical: 10,*/}
+                {/*            paddingHorizontal: 24,*/}
+                {/*            borderRadius: 999,*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        <Text style={{color: '#fff', fontWeight: '700'}}>*/}
+                {/*            {checkedInTime ? 'Checked In' : 'Check In Now'}*/}
+                {/*        </Text>*/}
+                {/*    </TouchableOpacity>*/}
+                {/*</View>*/}
 
                 {/* Summary */}
                 <View
