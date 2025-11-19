@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LineChart} from 'react-native-chart-kit';
 import {_AppContext} from '../context/_AppContext';
 
+
 export default function HomeScreen({navigation}) {
     const {customers, products} = useContext(_AppContext);
     const [isSyncing, setIsSyncing] = useState(false);
@@ -69,21 +70,21 @@ export default function HomeScreen({navigation}) {
                     marginBottom: 20
                 }}>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('CustomersScreen')}
+                        onPress={() => navigation.navigate('Customers')}
                         style={{flex: 1, marginRight: 10}}  // Adjust spacing as needed
                     >
                         <StatsCard label="Customers" value={customers.length} icon="account-group"/>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('ProductsScreen')}
+                        onPress={() => navigation.navigate('Products')}
                         style={{flex: 1, marginHorizontal: 5}}
                     >
                         <StatsCard label="Products" value={products.length} icon="package-variant"/>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('SalesScreen')}
+                        onPress={() => navigation.navigate('Payroll')}
                         style={{flex: 1, marginLeft: 10}}
                     >
                         <StatsCard label="Sales" value="1200" icon="cash-multiple"/>
