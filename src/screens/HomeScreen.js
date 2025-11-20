@@ -84,7 +84,7 @@ export default function HomeScreen({navigation}) {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('Payroll')}
+                        onPress={() => navigation.navigate('SalesReturnTotal')}
                         style={{flex: 1, marginLeft: 10}}
                     >
                         <StatsCard label="Sales" value="1200" icon="cash-multiple"/>

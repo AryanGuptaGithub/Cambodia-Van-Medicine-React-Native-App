@@ -1,15 +1,15 @@
 import React, {useContext, useMemo, useState} from 'react';
 import {Alert, FlatList, Keyboard, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {_AppContext} from '../context/_AppContext';
 import Header from '../../components/jsfiles/Header';
 import CustomerPicker from '../../components/jsfiles/CustomerPicker';
 import {ProductPicker} from '../../components/jsfiles/ProductPicker';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 export default function SalesScreen({navigation}) {
-    const {customers, products, addSaleRecord, decrementStock} = useContext(_AppContext);
+    const {customers, products, addSaleRecord, decrementStock, createSale} = useContext(_AppContext);
 
     const [saleData, setSaleData] = useState({
         customer: '',
@@ -52,6 +52,7 @@ export default function SalesScreen({navigation}) {
         setCustomerPickerVisible(false);
     };
 
+
     const addProductToCart = (product, qty) => {
         const pid = String(product.id);
         const quantity = Math.max(1, Number(qty) || 1);
@@ -81,11 +82,22 @@ export default function SalesScreen({navigation}) {
                 };
                 return updated;
             } else {
-                return [...prev, {...product, id: pid, quantity, price}];
+                // Only include safe fields
+                return [
+                    ...prev,
+                    {
+                        id: pid,
+                        name: String(product.name || ''),
+                        price: Number(product.sellingPrice || 0),
+                        quantity,
+                        stock: Number(product.stock || 0), // optional if you need
+                    }
+                ];
             }
         });
 
-        setProductPickerVisible(false);
+
+        // setProductPickerVisible(false);
     };
 
     const removeFromCart = (id) => setCart((prev) => prev.filter((item) => String(item.id) !== String(id)));
@@ -106,6 +118,7 @@ export default function SalesScreen({navigation}) {
         if (!editingItem) return;
         const newQty = Math.max(1, parseInt(editingQty, 10) || 1);
         const product = products.find((p) => String(p.id) === String(editingItem.id));
+
         if (product) {
             const productStock = typeof product.stock === 'number' ? product.stock : 0;
             if (newQty > productStock) {
@@ -114,9 +127,18 @@ export default function SalesScreen({navigation}) {
             }
         }
 
-        setCart((prev) =>
-            prev.map((it) => (String(it.id) === String(editingItem.id) ? {...it, quantity: newQty} : it))
-        );
+        setCart((prev) => {
+            const updated = prev.map((item) => {
+                if (String(item.id) === String(editingItem.id)) {
+                    return {
+                        ...item,
+                        quantity: newQty
+                    };
+                }
+                return item;
+            });
+            return updated;
+        });
 
         setEditingModalVisible(false);
         setEditingItem(null);
@@ -124,28 +146,31 @@ export default function SalesScreen({navigation}) {
     };
 
     const completeSale = async () => {
-        if (!saleData.customer) return Alert.alert('Select customer', 'Please choose a customer');
-        if (cart.length === 0) return Alert.alert('Cart empty', 'Please add at least one product');
+        if (!saleData.customer) return Alert.alert('Select customer');
+        if (cart.length === 0) return Alert.alert('Cart empty');
+
+        const customerObj = customers.find(c => String(c.id) === String(saleData.customer));
 
         const saleRecord = {
             invoice: saleData.invoiceNumber,
             customerId: saleData.customer,
+            customerName: customerObj?.name || "Unknown",
             items: cart,
             subtotal,
             discount: discountNumeric,
             vat: vatAmount,
-            deposit: depositNumeric,
             greenTotal,
+            deposit: depositNumeric,
             paidAmount: Number(saleData.paidAmount) || 0,
             balanceAmount,
             paymentType: saleData.paymentType,
-            createdAt: new Date().toISOString(),
         };
 
-        await addSaleRecord(saleRecord);
-        await decrementStock(cart.map((i) => ({id: i.id, quantity: i.quantity})));
+        await createSale(saleRecord);
 
-        Alert.alert('Sale Completed', `Invoice: ${saleData.invoiceNumber}`);
+        Alert.alert("Sale Completed", `Invoice: ${saleData.invoiceNumber}`);
+
+        // reset form
         setCart([]);
         setSaleData({
             customer: '',
@@ -153,7 +178,7 @@ export default function SalesScreen({navigation}) {
             discount: '0',
             deposit: '0',
             paymentType: 'Cash',
-            paidAmount: '0'
+            paidAmount: '0',
         });
     };
 
@@ -226,25 +251,42 @@ export default function SalesScreen({navigation}) {
                                     backgroundColor: '#f9fafb',
                                     padding: 10,
                                     borderRadius: 8,
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between'
                                 }}>
-                                    <View>
-                                        <Text style={{fontWeight: '700'}}>{item.name}</Text>
-                                        <Text style={{fontSize: 12, marginTop: 4}}>Qty: {item.quantity} ×
-                                            ${item.price}</Text>
-                                        <Text style={{
-                                            fontWeight: '600',
-                                            marginTop: 4
-                                        }}>${(item.quantity * item.price).toFixed(2)}</Text>
-                                    </View>
-                                    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 15}}>
-                                        <TouchableOpacity onPress={() => openEditItem(item)}>
-                                            <MaterialIcons name="edit" size={20} color="#0ea7e8"/>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => removeFromCart(item.id)}>
-                                            <MaterialIcons name="delete" size={20} color="#b91c1c"/>
-                                        </TouchableOpacity>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <View style={{flex: 1}}>
+                                            <Text
+                                                style={{fontWeight: '700'}}>{item.name ? String(item.name) : ''}</Text>
+                                            <Text style={{fontSize: 12, marginTop: 4, color: '#6b7280'}}>
+                                                Qty: {Number(item.quantity) || 0} × ${Number(item.price) || 0}
+                                            </Text>
+                                            <Text style={{fontWeight: '600', marginRight: 10}}>
+                                                ${((Number(item.quantity) || 0) * (Number(item.price) || 0)).toFixed(2)}
+                                            </Text>
+                                        </View>
+
+
+                                        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                                            <TouchableOpacity onPress={() => openEditItem(item)}>
+                                                <FontAwesome5
+                                                    name="edit"   // edit icon
+                                                    size={18}
+                                                    color="#059669"
+                                                    solid
+                                                />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => removeFromCart(item.id)}>
+                                                <FontAwesome5
+                                                    name="trash"  // trash icon
+                                                    size={18}
+                                                    color="#b91c1c"
+                                                    solid
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
                                     </View>
                                 </View>
                             )}
@@ -383,7 +425,8 @@ export default function SalesScreen({navigation}) {
 
             {/* Product Picker */}
             <ProductPicker visible={productPickerVisible} onClose={() => setProductPickerVisible(false)}
-                           products={products} onAddProduct={(product, qty) => addProductToCart(product, qty)}/>
+                           products={products}
+                           onAddProduct={(product) => addProductToCart(product, product.qty || 1)}/>
 
             {/* Edit Quantity Modal */}
             <Modal visible={editingModalVisible} transparent animationType="slide">

@@ -43,6 +43,41 @@ export const AppProvider = ({children}) => {
         await AsyncStorage.setItem('products', JSON.stringify(next));
     };
 
+
+    const createSale = async (saleData) => {
+        const sale = {
+            id: String(Date.now()),
+            invoice: saleData.invoice,
+            customerId: saleData.customerId,
+            customerName: saleData.customerName,
+            items: saleData.items,
+            discount: saleData.discount || 0,
+            vat: saleData.vat || 0,
+            greenTotal: saleData.greenTotal,
+            deposit: saleData.deposit || 0,
+            paidAmount: saleData.paidAmount || 0,
+            balanceAmount: saleData.balanceAmount,
+            returnsAmount: 0,
+            paymentType: saleData.paymentType || "Cash",
+            createdAt: new Date().toISOString()
+        };
+
+        // Save to sales history
+        const updatedHistory = [sale, ...salesHistory];
+        setSalesHistory(updatedHistory);
+        await AsyncStorage.setItem("salesHistory", JSON.stringify(updatedHistory));
+
+        // Update stock
+        const stockItems = sale.items.map(i => ({
+            id: i.id,
+            quantity: i.quantity
+        }));
+        await decrementStock(stockItems);
+
+        return sale;
+    };
+
+
     const addCustomer = async (customer) => {
         const id = customer.id ?? String(Date.now());
         const next = [{...customer, id}, ...customers];

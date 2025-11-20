@@ -12,6 +12,9 @@ import {
     View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faCheckCircle} from '@fortawesome/free-solid-svg-icons';
+
 
 export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, products = []}) {
     const [query, setQuery] = useState('');
@@ -20,6 +23,7 @@ export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, 
     const [editing, setEditing] = useState(null);
     const [editForm, setEditForm] = useState({});
     const [selectedProducts, setSelectedProducts] = useState({});
+
 
     useEffect(() => {
         if (!visible) {
@@ -33,11 +37,23 @@ export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, 
     }, [visible, products]);
 
     const handleDone = () => {
+        console.log('Selected Products BEFORE sending to cart:', selectedProducts);
+
         if (onAddProduct) {
-            Object.values(selectedProducts).forEach(prod => onAddProduct(prod));
+            Object.values(selectedProducts).forEach(prod => {
+                const safeProd = {
+                    id: String(prod.id || ''),
+                    name: String(prod.name || ''),
+                    price: Number(prod.price || prod.sellingPrice || 0) || 0,
+                    qty: Number(prod.qty || 1) || 1,
+                };
+                console.log('Sending to cart:', safeProd);
+                onAddProduct(safeProd, safeProd.qty);
+            });
         }
         onClose && onClose();
     };
+    ``
 
     const renderProduct = ({item}) => (
         <View style={styles.row}>
@@ -53,13 +69,33 @@ export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, 
             />
             <TouchableOpacity
                 onPress={() => {
-                    const qty = Math.max(1, parseInt(qtyMap[String(item.id)] || '1', 10));
-                    setSelectedProducts(prev => ({...prev, [String(item.id)]: {...item, qty}}));
+                    // toggle selection locally
+                    setSelectedProducts(prev => {
+                        const newSelected = {...prev};
+                        if (newSelected[String(item.id)]) {
+                            delete newSelected[String(item.id)]; // remove if already selected
+                        } else {
+                            const qty = Math.max(1, parseInt(qtyMap[String(item.id)] || '1', 10));
+                            newSelected[String(item.id)] = {
+                                id: String(item.id),
+                                name: String(item.name || ''),
+                                price: Number(item.sellingPrice || 0),
+                                qty,
+                            };
+                        }
+                        return newSelected;
+                    });
                 }}
-                style={styles.addBtn}
+                style={{padding: 4, marginLeft: 8}}
             >
-                <Text style={{color: '#fff'}}>{selectedProducts[String(item.id)] ? 'Selected' : 'Add'}</Text>
+                {selectedProducts[String(item.id)] ? (
+                    <FontAwesomeIcon icon={faCheckCircle} size={24} color="green"/>
+                ) : (
+                    <Text style={{color: '#059669', fontWeight: '700', fontSize: 15}}>Add</Text>
+                )}
             </TouchableOpacity>
+
+
         </View>
     );
 
