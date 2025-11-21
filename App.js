@@ -26,17 +26,19 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import MainStack from './src/navigation/MainStack';
 import {AppProvider} from './src/context/_AppContext';
 import Toast from 'react-native-toast-message';
+import {NotificationProvider} from './src/context/_NotificationContext';
 
 export default function App() {
     return (
         <SafeAreaProvider>
-            <AppProvider>
-                <NavigationContainer>
-                    <MainStack/>
-                </NavigationContainer>
+            <NotificationProvider>
+                <AppProvider>
+                    <NavigationContainer>
+                        <MainStack/>
+                    </NavigationContainer>
 
-            </AppProvider>
-
+                </AppProvider>
+            </NotificationProvider>
             <Toast/>
         </SafeAreaProvider>
     );

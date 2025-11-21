@@ -12,6 +12,11 @@ import PayrollScreen from '../screens/PayrollScreen';
 import AttendanceScreen from '../screens/AttendanceScreen';
 import CustomerDetailsScreen from '../screens/CustomerDetailsScreen';
 import SalesReturnTotalScreen from "../screens/SalesReturnTotalScreen";
+import ProfileScreen from '../screens/ProfileScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
+import StocksScreen from '../screens/StocksScreen';
+import ProductDetailsScreen from '../screens/ProductDetailsScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +37,10 @@ export default function MainStack() {
                 component={CustomerDetailsScreen}
             />
             <Stack.Screen name="SalesReturnTotal" component={SalesReturnTotalScreen}/>
+            <Stack.Screen name="Profile" component={ProfileScreen}/>
+            <Stack.Screen name="Notifications" component={NotificationsScreen}/>
+            <Stack.Screen name="Stocks" component={StocksScreen}/>
+            <Stack.Screen name="ProductDetails" component={ProductDetailsScreen}/>
         </Stack.Navigator>
     );
 }

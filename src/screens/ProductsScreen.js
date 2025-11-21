@@ -48,7 +48,10 @@ export default function ProductsScreen({navigation}) {
         const lowStock = stock <= LOW_STOCK_THRESHOLD;
 
         return (
-            <View
+            <TouchableOpacity
+                onPress={() =>
+                    navigation.navigate('ProductDetails', {productId: item.id})
+                }
                 style={{
                     backgroundColor: '#fff',
                     padding: 12,
@@ -70,14 +73,17 @@ export default function ProductsScreen({navigation}) {
                         >
                             {item.name}
                         </Text>
+
                         <Text style={{fontSize: 12, color: '#6b7280'}}>
                             Type: {item.type || 'N/A'}
                         </Text>
+
                         {item.drugLicense ? (
                             <Text style={{fontSize: 11, color: '#9ca3af'}}>
                                 License: {item.drugLicense}
                             </Text>
                         ) : null}
+
                         {item.validity ? (
                             <Text style={{fontSize: 11, color: '#4b5563'}}>
                                 Valid till: {item.validity}
@@ -88,12 +94,6 @@ export default function ProductsScreen({navigation}) {
                     <View style={{alignItems: 'flex-end'}}>
                         <Text style={{fontSize: 12, color: '#6b7280'}}>Selling</Text>
                         <Text style={{fontWeight: '700'}}>${item.sellingPrice}</Text>
-                        {/*<Text style={{fontSize: 12, color: '#6b7280', marginTop: 4}}>*/}
-                        {/*    Purchase*/}
-                        {/*</Text>*/}
-                        {/*<Text style={{fontWeight: '600', fontSize: 12}}>*/}
-                        {/*    ${item.purchasingPrice}*/}
-                        {/*</Text>*/}
                     </View>
                 </View>
 
@@ -120,12 +120,11 @@ export default function ProductsScreen({navigation}) {
                                 color: lowStock ? '#b91c1c' : '#166534',
                             }}
                         >
-                            Stock: {stock}{' '}
-                            {lowStock ? '(Low)' : ''}
+                            Stock: {stock} {lowStock ? '(Low)' : ''}
                         </Text>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     };
 
@@ -134,7 +133,7 @@ export default function ProductsScreen({navigation}) {
             <Header
                 title="Products"
                 onBack={() => navigation.goBack()}
-                onAdd={() => navigation.navigate('AddProduct')}
+                // onAdd={() => navigation.navigate('AddProduct')}
                 backgroundColor="#6d28d9"
             />
 
@@ -236,6 +235,7 @@ export default function ProductsScreen({navigation}) {
                     paddingBottom: 20,
                 }}
                 renderItem={renderItem}
+
                 ListEmptyComponent={
                     <Text style={{padding: 12, color: '#6b7280'}}>
                         {products.length === 0

@@ -4,11 +4,12 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LineChart} from 'react-native-chart-kit';
 import {_AppContext} from '../context/_AppContext';
-
+import {_NotificationContext} from '../context/_NotificationContext';
 
 export default function HomeScreen({navigation}) {
     const {customers, products} = useContext(_AppContext);
     const [isSyncing, setIsSyncing] = useState(false);
+    const {unreadCount} = useContext(_NotificationContext);
 
     // Example data for the sales chart
     const salesData = [100, 200, 300, 400, 500, 600, 700];
@@ -30,19 +31,42 @@ export default function HomeScreen({navigation}) {
 
                 {/* Notifications and Profile */}
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <TouchableOpacity style={{marginRight: 16}}>
-                        <Icon name="bell-outline" size={24} color="#4b5563"/>
+                    <TouchableOpacity
+                        style={{marginRight: 16}}
+                        onPress={() => navigation.navigate('Notifications')}
+                    >
+                        <View style={{}}>
+                            <Icon name="bell-outline" size={24} color="#4b5563"/>
+
+                            {/* Red Badge */}
+                            {unreadCount > 0 && (
+                                <View
+                                    style={{
+                                        position: 'absolute',
+                                        right: -2,
+                                        top: -2,
+                                        height: 10,
+                                        width: 10,
+                                        borderRadius: 10,
+                                        backgroundColor: 'red',
+                                    }}
+                                />
+                            )}
+                        </View>
                     </TouchableOpacity>
-                    <View style={{
-                        height: 42,
-                        width: 42,
-                        borderRadius: 25,
-                        backgroundColor: '#e5e7eb',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}>
-                        <Icon name="account" size={24} color="#4b5563"/>
-                    </View>
+                    <TouchableOpacity style={{marginRight: 16}} onPress={() => navigation.navigate('Profile')}>
+                        <View style={{
+                            height: 42,
+                            width: 42,
+                            borderRadius: 25,
+                            backgroundColor: '#e5e7eb',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
+                            <Icon name="account" size={24} color="#4b5563"/>
+                        </View>
+                    </TouchableOpacity>
+
                 </View>
             </View>
 
@@ -130,6 +154,8 @@ export default function HomeScreen({navigation}) {
                         <NavButton label="Payroll" icon="currency-usd" onPress={() => navigation.navigate('Payroll')}/>
                         <NavButton label="Attendance" icon="calendar-check"
                                    onPress={() => navigation.navigate('Attendance')}/>
+                        <NavButton label="Stocks" icon="warehouse" onPress={() => navigation.navigate('Stocks')}/>
+
                     </View>
                 </View>
 

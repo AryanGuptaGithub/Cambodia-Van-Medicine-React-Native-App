@@ -43,44 +43,46 @@ export default function CustomersScreen({navigation}) {
 
 
     const renderItem = ({item}) => (
-        <View
-            style={{
-                backgroundColor: '#fff',
-                padding: 12,
-                borderRadius: 10,
-                marginBottom: 10,
-                borderWidth: 1,
-                borderColor: '#e5e7eb',
-            }}
-        >
-            <TouchableOpacity onPress={() => navigation.navigate('CustomerDetails', {customer: item})}>
-                <Text style={{fontWeight: '700', fontSize: 16}}>{item.name}</Text>
-            </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('CustomerDetails', {customer: item})}>
+            <View
+                style={{
+                    backgroundColor: '#fff',
+                    padding: 12,
+                    borderRadius: 10,
+                    marginBottom: 10,
+                    borderWidth: 1,
+                    borderColor: '#e5e7eb',
+                }}
+            >
+                <TouchableOpacity onPress={() => navigation.navigate('CustomerDetails', {customer: item})}>
+                    <Text style={{fontWeight: '700', fontSize: 16}}>{item.name}</Text>
+                </TouchableOpacity>
 
-            <Text style={{color: '#6b7280', marginTop: 4}}>
-                {(item.agent || 'Unknown type') +
-                    (item.zone ? ` • ${item.zone}` : '') +
-                    (item.province ? ` • ${item.province}` : '')}
-            </Text>
-
-            {item.medRep && (
-                <Text style={{marginTop: 4, fontSize: 12, color: '#4b5563'}}>
-                    Med Rep: <Text style={{fontWeight: '600'}}>{item.medRep}</Text>
+                <Text style={{color: '#6b7280', marginTop: 4}}>
+                    {(item.agent || 'Unknown type') +
+                        (item.zone ? ` • ${item.zone}` : '') +
+                        (item.province ? ` • ${item.province}` : '')}
                 </Text>
-            )}
 
-            {item.phone && (
-                <Text style={{fontSize: 12, color: '#4b5563'}}>
-                    Phone: <Text style={{fontWeight: '600'}}>{item.phone}</Text>
-                </Text>
-            )}
+                {item.medRep && (
+                    <Text style={{marginTop: 4, fontSize: 12, color: '#4b5563'}}>
+                        Med Rep: <Text style={{fontWeight: '600'}}>{item.medRep}</Text>
+                    </Text>
+                )}
 
-            {typeof item.outstanding === 'number' && (
-                <Text style={{marginTop: 8, fontWeight: '700', color: '#b91c1c'}}>
-                    Outstanding: ${item.outstanding}
-                </Text>
-            )}
-        </View>
+                {item.phone && (
+                    <Text style={{fontSize: 12, color: '#4b5563'}}>
+                        Phone: <Text style={{fontWeight: '600'}}>{item.phone}</Text>
+                    </Text>
+                )}
+
+                {typeof item.outstanding === 'number' && (
+                    <Text style={{marginTop: 8, fontWeight: '700', color: '#b91c1c'}}>
+                        Outstanding: ${item.outstanding}
+                    </Text>
+                )}
+            </View>
+        </TouchableOpacity>
     );
 
 

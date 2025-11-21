@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Healthcare_Van",
+    "name": "Cambodia Hospital",
     "slug": "Movie_App",
     "version": "1.0.0",
     "jsEngine": "hermes",
@@ -58,6 +58,7 @@
       "eas": {
         "projectId": "f1b190b9-2167-436c-ad00-b25554c16971"
       }
-    }
+    },
+    "owner": "aryangupta1520"
   }
 }
