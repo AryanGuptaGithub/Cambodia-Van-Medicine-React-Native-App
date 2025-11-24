@@ -3,6 +3,7 @@ import {KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View}
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function RegisterScreen({navigation}) {
     const [name, setName] = useState('');
@@ -24,31 +25,31 @@ export default function RegisterScreen({navigation}) {
         }
 
         const user = {
-            id: String(Date.now()),
             name,
             email,
             phone,
-            role: 'Medical Representative',
-            company: 'Healthcare Van',
-            avatar: '/mnt/data/16e1317b-3d59-4f8c-accf-97815479089d.jpg'
+            password
+            // No need to send 'role' anymore
         };
 
-        await AsyncStorage.setItem('user', JSON.stringify(user));
+        try {
+            const response = await axios.post('https://sprightlier-deepwater-tanisha.ngrok-free.dev/api/auth/register', user);
+            const {token, user: userData} = response.data;
+            await AsyncStorage.setItem('token', token);
+            await AsyncStorage.setItem('user', JSON.stringify(userData));
 
-        navigation.replace('Home');
+            navigation.replace('Home'); // Navigate to Home screen after registration
+        } catch (error) {
+            console.error("Registration error: ", error.response?.data?.message || error.message);
+            alert(error.response?.data?.message || 'Registration failed. Please try again.');
+        }
     };
 
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#f4f6f9'}}>
-            <KeyboardAvoidingView
-                style={{flex: 1}}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            >
-
+            <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <View style={{paddingTop: 40, paddingHorizontal: 24}}>
-                    <Text style={{fontSize: 28, fontWeight: '700', color: '#1f2937'}}>
-                        Create Account ✨
-                    </Text>
+                    <Text style={{fontSize: 28, fontWeight: '700', color: '#1f2937'}}>Create Account ✨</Text>
                     <Text style={{fontSize: 14, color: '#6b7280', marginTop: 6}}>
                         Register to start managing your sales.
                     </Text>
@@ -62,11 +63,8 @@ export default function RegisterScreen({navigation}) {
                     borderRadius: 16,
                     elevation: 4
                 }}>
-
-                    {/* Name */}
-                    <Text style={{fontSize: 12, fontWeight: '600', marginBottom: 6, color: '#6b7280'}}>
-                        Full Name
-                    </Text>
+                    {/* Full Name */}
+                    <Text style={styles.label}>Full Name</Text>
                     <View style={styles.inputBox}>
                         <Icon name="account-outline" size={20} color="#9ca3af"/>
                         <TextInput
@@ -136,17 +134,15 @@ export default function RegisterScreen({navigation}) {
                         />
                     </View>
 
-                    <TouchableOpacity
-                        onPress={handleRegister}
-                        style={styles.button}
-                    >
+                    {/* Register Button */}
+                    <TouchableOpacity onPress={handleRegister} style={styles.button}>
                         <Text style={styles.buttonText}>Register</Text>
                     </TouchableOpacity>
 
+                    {/* Go back to login */}
                     <TouchableOpacity onPress={() => navigation.goBack()} style={{marginTop: 16, alignSelf: 'center'}}>
                         <Text style={{color: '#2563eb', fontWeight: '600'}}>Already have an account? Login</Text>
                     </TouchableOpacity>
-
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -162,7 +158,7 @@ const styles = {
         backgroundColor: '#f9fafb',
         borderRadius: 10,
         paddingHorizontal: 10,
-        marginBottom: 14
+        marginBottom: 14,
     },
     input: {flex: 1, paddingVertical: 10, marginLeft: 8},
     label: {fontSize: 12, fontWeight: '600', marginBottom: 6, color: '#6b7280'},
@@ -171,7 +167,7 @@ const styles = {
         backgroundColor: '#2563eb',
         paddingVertical: 14,
         borderRadius: 12,
-        alignItems: 'center'
+        alignItems: 'center',
     },
-    buttonText: {color: '#fff', fontWeight: '700', fontSize: 16}
+    buttonText: {color: '#fff', fontWeight: '700', fontSize: 16},
 };

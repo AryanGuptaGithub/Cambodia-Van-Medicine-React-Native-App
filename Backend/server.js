@@ -8,7 +8,7 @@ const errorHandler = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
-// const customerRoutes = require('./routes/customers');
+const customerRoutes = require('./routes/customers');
 // const orderRoutes = require('./routes/orders');
 
 const app = express();
@@ -19,10 +19,16 @@ app.use(morgan('dev'));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
-// app.use('/api/customers', customerRoutes);
+app.use('/api/customers', customerRoutes);
 // app.use('/api/orders', orderRoutes);
 
 app.get('/', (req, res) => res.json({ok: true, msg: 'Backend is live'}));
+
+app.use((req, res, next) => {
+    console.log(`Received request: ${req.method} ${req.url}`);
+    next();
+});
+
 
 app.use(errorHandler);
 

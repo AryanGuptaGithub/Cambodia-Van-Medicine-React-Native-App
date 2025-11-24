@@ -1,23 +1,40 @@
 // src/screens/CustomersScreen.js
-import React, {useContext, useMemo, useState} from 'react';
-// A very lightweight "input" using Text as you were using plain React Native.
-// If you already use TextInput somewhere common, you can swap it.
+import React, {useEffect, useMemo, useState} from 'react';
 import {FlatList, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {_AppContext} from '../context/_AppContext';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../components/jsfiles/Header';
 
 export default function CustomersScreen({navigation}) {
-    const {customers} = useContext(_AppContext);
-
+    const [customers, setCustomers] = useState([]);
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState('all'); // all | pharmacy | hospital | clinic | distributor | agent
+
+    // Fetch customers for the logged-in user
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await axios.get('https://sprightlier-deepwater-tanisha.ngrok-free.dev/api/customers', {
+                    headers: {Authorization: `Bearer ${token}`}, // Pass token in the Authorization header
+                });
+                setCustomers(response.data); // Set customers state with the fetched data
+            } catch (error) {
+                console.error("Failed to fetch customers:", error);
+            }
+        };
+
+        fetchCustomers();
+    }, []);
 
     const filteredCustomers = useMemo(() => {
         const q = search.trim().toLowerCase();
 
         return customers.filter((c) => {
-            // type filter
+            // Type filter
             if (typeFilter !== 'all') {
                 const agent = (c.agent || '').toLowerCase();
                 if (!agent.includes(typeFilter)) return false;
@@ -41,7 +58,6 @@ export default function CustomersScreen({navigation}) {
         });
     }, [customers, search, typeFilter]);
 
-
     const renderItem = ({item}) => (
         <TouchableOpacity onPress={() => navigation.navigate('CustomerDetails', {customer: item})}>
             <View
@@ -54,10 +70,7 @@ export default function CustomersScreen({navigation}) {
                     borderColor: '#e5e7eb',
                 }}
             >
-                <TouchableOpacity onPress={() => navigation.navigate('CustomerDetails', {customer: item})}>
-                    <Text style={{fontWeight: '700', fontSize: 16}}>{item.name}</Text>
-                </TouchableOpacity>
-
+                <Text style={{fontWeight: '700', fontSize: 16}}>{item.name}</Text>
                 <Text style={{color: '#6b7280', marginTop: 4}}>
                     {(item.agent || 'Unknown type') +
                         (item.zone ? ` • ${item.zone}` : '') +
@@ -85,7 +98,6 @@ export default function CustomersScreen({navigation}) {
         </TouchableOpacity>
     );
 
-
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#f8fafc'}}>
             <Header
@@ -108,42 +120,26 @@ export default function CustomersScreen({navigation}) {
                         marginBottom: 8,
                     }}
                 >
-                    <Text
-                        style={{fontSize: 12, color: '#6b7280', marginBottom: 2}}
-                    >
-                        Search
-                    </Text>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Text
-                            style={{
-                                fontSize: 18,
-                                marginRight: 6,
-                                color: '#9ca3af',
-                            }}
-                        >
-                            🔍
-                        </Text>
-                        <InputLikeText
+                    <Text style={{fontSize: 12, color: '#6b7280', marginBottom: 2}}>Search</Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={{fontSize: 18, marginRight: 6, color: '#9ca3af'}}>🔍</Text>
+                        <TextInput
                             value={search}
                             onChangeText={setSearch}
                             placeholder="Name, type, province, phone..."
+                            style={{
+                                flex: 1,
+                                paddingVertical: 4,
+                                fontSize: 14,
+                                color: '#374151',
+                            }}
+                            placeholderTextColor="#9ca3af"
                         />
                     </View>
                 </View>
 
                 {/* Type filter chips */}
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        marginBottom: 8,
-                    }}
-                >
+                <View style={{flexDirection: 'row', flexWrap: 'wrap', marginBottom: 8}}>
                     {[
                         {key: 'all', label: 'All'},
                         {key: 'pharmacy', label: 'Pharmacy'},
@@ -195,21 +191,5 @@ export default function CustomersScreen({navigation}) {
                 }
             />
         </SafeAreaView>
-    );
-}
-
-function InputLikeText({value, onChangeText, placeholder}) {
-    return (
-        <TextInput
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            style={{
-                flex: 1,
-                paddingVertical: 4,
-                fontSize: 14,
-            }}
-            placeholderTextColor="#9ca3af"
-        />
     );
 }

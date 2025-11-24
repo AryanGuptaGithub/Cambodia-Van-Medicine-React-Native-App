@@ -1,3 +1,4 @@
+// backend/models/customer.js
 const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
@@ -6,6 +7,7 @@ const customerSchema = new mongoose.Schema({
     address: {type: String},
     city: {type: String},
     code: {type: String}, // customer code / id
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},  // Link to the user
     createdAt: {type: Date, default: Date.now}
 });
 

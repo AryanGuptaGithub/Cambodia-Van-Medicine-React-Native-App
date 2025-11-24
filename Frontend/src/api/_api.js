@@ -104,7 +104,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = 'http://YOUR_BACKEND_URL:4000/api'; // replace with your backend URL
+const BASE_URL = 'https://sprightlier-deepwater-tanisha.ngrok-free.dev/api'; // replace with your backend URL
 
 // ----- AUTH -----
 export const login = async (email, password) => {

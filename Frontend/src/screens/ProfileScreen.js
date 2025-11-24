@@ -116,7 +116,7 @@ export default function ProfileScreen({navigation}) {
                 {/* Actions */}
                 <View style={styles.actions}>
                     <TouchableOpacity style={styles.actionBtn} onPress={onEditProfile}>
-                        <Icon name="account-edit" size={18} color="#2563eb"/>
+                        <Icon name="account-edit" size={15} color="#2563eb"/>
                         <Text style={styles.actionText}>Edit Profile</Text>
                     </TouchableOpacity>
 
@@ -126,7 +126,7 @@ export default function ProfileScreen({navigation}) {
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Attendance')}>
-                        <Icon name="calendar-check" size={18} color="#3b82f6"/>
+                        <Icon name="calendar-check" size={15} color="#3b82f6"/>
                         <Text style={styles.actionText}>Attendance</Text>
                     </TouchableOpacity>
                 </View>

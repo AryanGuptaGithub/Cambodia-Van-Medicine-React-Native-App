@@ -3,6 +3,7 @@ import React, {createContext, useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as api from '../api/_api';
 
+
 export const _AppContext = createContext();
 
 export const AppProvider = ({children}) => {

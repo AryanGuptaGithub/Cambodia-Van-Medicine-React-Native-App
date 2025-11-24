@@ -1,45 +1,30 @@
 // src/screens/LoginScreen.js
-import React, {useEffect, useState} from 'react';
-import {KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
+import {Alert, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {login} from '../api/_api'; // Import the login function from _api.js
 
 export default function LoginScreen({navigation}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPass, setShowPass] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    // 🔥 Auto-redirect if user already logged in
-    useEffect(() => {
-        (async () => {
-            const raw = await AsyncStorage.getItem('user');
-            if (raw) {
-                navigation.replace('Home');
-            }
-        })();
-    }, []);
-
-    // 🔥 Save and login
     const handleLogin = async () => {
-        if (!email || !password) {
-            alert("Please enter email and password");
-            return;
+        try {
+            setLoading(true);  // Show loading state
+            const response = await login(email, password);
+            if (response.token) {
+                // Successfully logged in, navigate to Home
+                Alert.alert('Login Successful', 'Welcome back!', [
+                    {text: 'OK', onPress: () => navigation.replace('Home')},
+                ]);
+            }
+        } catch (error) {
+            setLoading(false);  // Hide loading state
+            Alert.alert('Login Failed', error.message || 'Please try again.');
         }
-
-        // Dummy user (replace with real API later)
-        const user = {
-            id: 'mr-001',
-            name: 'MR John Doe',
-            email,
-            role: 'Medical Representative',
-            company: 'Healthcare Van',
-            avatar: '/mnt/data/16e1317b-3d59-4f8c-accf-97815479089d.jpg'
-        };
-
-        await AsyncStorage.setItem('user', JSON.stringify(user));
-
-        navigation.replace('Home');  // proper login redirect
     };
 
     return (
@@ -48,7 +33,6 @@ export default function LoginScreen({navigation}) {
                 style={{flex: 1}}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             >
-
                 {/* Header */}
                 <View style={{paddingTop: 40, paddingHorizontal: 24}}>
                     <Text style={{fontSize: 28, fontWeight: '700', color: '#1f2937'}}>
@@ -78,8 +62,9 @@ export default function LoginScreen({navigation}) {
                         fontWeight: '600',
                         marginBottom: 6,
                         color: '#6b7280'
-                    }}>Email / Username</Text>
-
+                    }}>
+                        Email / Username
+                    </Text>
                     <View style={{
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -106,8 +91,9 @@ export default function LoginScreen({navigation}) {
                         fontWeight: '600',
                         marginBottom: 6,
                         color: '#6b7280'
-                    }}>Password</Text>
-
+                    }}>
+                        Password
+                    </Text>
                     <View style={{
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -135,6 +121,16 @@ export default function LoginScreen({navigation}) {
                         </TouchableOpacity>
                     </View>
 
+                    {/* Forgot Password */}
+                    <TouchableOpacity
+                        style={{marginTop: 10, alignSelf: 'flex-end'}}
+                        onPress={() => navigation.navigate('ForgotPassword')}
+                    >
+                        <Text style={{fontSize: 12, color: '#2563eb', fontWeight: '600'}}>
+                            Forgot password?
+                        </Text>
+                    </TouchableOpacity>
+
                     {/* Login Button */}
                     <TouchableOpacity
                         onPress={handleLogin}
@@ -148,13 +144,52 @@ export default function LoginScreen({navigation}) {
                             shadowOpacity: 0.3,
                             shadowOffset: {width: 0, height: 3}
                         }}
+                        disabled={loading}  // Disable while loading
                     >
                         <Text style={{color: '#fff', fontWeight: '700', fontSize: 16}}>
-                            Login
+                            {loading ? 'Logging in...' : 'Login'}
                         </Text>
                     </TouchableOpacity>
 
                 </View>
+
+                {/* Bottom Register Link */}
+                <View style={{
+                    marginTop: 20,
+                    alignItems: 'center'
+                }}>
+                    <Text style={{color: '#6b7280'}}>
+                        Don’t have an account?{' '}
+                        <Text
+                            onPress={() => navigation.navigate('Register')}
+                            style={{color: '#2563eb', fontWeight: '700'}}
+                        >
+                            Register
+                        </Text>
+                    </Text>
+                </View>
+
+                <View style={{alignItems: 'center', marginTop: 100}}>
+                    <Text>For the testing use to login:</Text>
+                    <View
+                        style={{
+                            marginTop: 8,
+                            borderWidth: 1,
+                            padding: 10,
+                            borderRadius: 16,
+                            backgroundColor: '#fff',
+                            borderColor: 'orange'
+                        }}>
+                        <Text>
+                            Email: <Text>mr1@email.com</Text>
+                        </Text>
+                        <Text>
+                            Password: <Text>12345678</Text>
+                        </Text>
+                    </View>
+
+                </View>
+
 
             </KeyboardAvoidingView>
         </SafeAreaView>
