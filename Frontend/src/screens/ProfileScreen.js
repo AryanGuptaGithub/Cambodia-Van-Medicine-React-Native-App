@@ -51,14 +51,18 @@ export default function ProfileScreen({navigation}) {
                 text: 'Logout',
                 style: 'destructive',
                 onPress: async () => {
-                    // Clear user storage and navigate to auth (if present)
                     await AsyncStorage.removeItem('user');
-                    // navigate to login or goBack
-                    navigation.navigate('Home'); // change as per your auth flow
+
+                    // Reset navigation and go to Login
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: 'Login'}],
+                    });
                 },
             },
         ]);
     };
+
 
     const onEditProfile = () => {
         // open an edit screen or modal (not implemented here)

@@ -16,6 +16,9 @@ import ProfileScreen from '../screens/ProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import StocksScreen from '../screens/StocksScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -23,6 +26,10 @@ const Stack = createNativeStackNavigator();
 export default function MainStack() {
     return (
         <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
+
+            {/* 🔐 Authentication */}
+            <Stack.Screen name="Login" component={LoginScreen}/>
+
             <Stack.Screen name="Home" component={HomeScreen}/>
             <Stack.Screen name="Customers" component={CustomersScreen}/>
             <Stack.Screen name="AddCustomer" component={AddCustomerScreen}/>
@@ -41,6 +48,9 @@ export default function MainStack() {
             <Stack.Screen name="Notifications" component={NotificationsScreen}/>
             <Stack.Screen name="Stocks" component={StocksScreen}/>
             <Stack.Screen name="ProductDetails" component={ProductDetailsScreen}/>
+            <Stack.Screen name="Register" component={RegisterScreen}/>
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
+
         </Stack.Navigator>
     );
 }

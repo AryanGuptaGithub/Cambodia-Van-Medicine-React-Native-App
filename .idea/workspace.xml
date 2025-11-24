@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="332184ee-779d-4907-9472-d79961b6fe90" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Backend/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/config/db.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/controllers/authController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/controllers/customerController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/controllers/ordersController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/controllers/productController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/middleware/Auth.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/middleware/errorHandler.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/models/Customer.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/models/Order.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/models/User.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/models/product.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/routes/auth.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/routes/products.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/server.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/screens/ForgotPasswordScreen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/screens/LoginScreen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/screens/RegisterScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Combodia_Hostpital_ReactNative_App.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/prettier.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/extensions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-background.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-foreground.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-monochrome.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/partial-react-logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/react-logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/react-logo@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/react-logo@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/splash-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/splash_logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/profilepicture/profilepicture1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/external-link.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/haptic-tab.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/hello-wave.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/jsfiles/CustomerPicker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/jsfiles/Header.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/jsfiles/ProductPicker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/parallax-scroll-view.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/themed-text.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/themed-view.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/collapsible.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/icon-symbol.ios.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/icon-symbol.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/constants/theme.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/eas.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/eslint.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hooks/use-color-scheme.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hooks/use-color-scheme.web.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/hooks/use-theme-color.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/metro.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/metro.config.js.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/reset-project.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/_api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/_AppContext.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/_NotificationContext.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/MainStack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/AddCustomerScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/AddProductScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/AttendanceScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/CustomerDetailsScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/CustomersScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/HomeScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/NotificationsScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/PayrollScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/ProductDetailsScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/ProductsScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/ProfileScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/ReturnsScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/SalesReturnTotalScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/SalesScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/StocksScreen.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/Toast.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="35Pifey9cvqRhledXrMxQKPqfzs" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ASUS/Documents/React_Native_App/Combodia_Hostpital_ReactNative_App&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ASUS\\Documents\\React_Native_App\\Combodia_Hostpital_ReactNative_App\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ASUS\Documents\React_Native_App\Combodia_Hostpital_ReactNative_App\src\screens" />
+      <recent name="C:\Users\ASUS\Documents\React_Native_App\Combodia_Hostpital_ReactNative_App\components\jsfiles" />
+      <recent name="C:\Users\ASUS\Documents\React_Native_App\Combodia_Hostpital_ReactNative_App" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.27397.92" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="332184ee-779d-4907-9472-d79961b6fe90" name="Changes" comment="" />
+      <created>1763018212294</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1763018212294</updated>
+      <workItem from="1763018214495" duration="12828000" />
+      <workItem from="1763095618105" duration="7994000" />
+      <workItem from="1763117429573" duration="3628000" />
+      <workItem from="1763121109356" duration="395000" />
+      <workItem from="1763182269366" duration="19081000" />
+      <workItem from="1763354020431" duration="2576000" />
+      <workItem from="1763358418219" duration="17330000" />
+      <workItem from="1763381005126" duration="38000" />
+      <workItem from="1763440880747" duration="13464000" />
+      <workItem from="1763527720177" duration="25864000" />
+      <workItem from="1763610838233" duration="19749000" />
+      <workItem from="1763700142169" duration="14391000" />
+      <workItem from="1763726951188" duration="2462000" />
+      <workItem from="1763784671326" duration="1094000" />
+      <workItem from="1763964398651" duration="8379000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
