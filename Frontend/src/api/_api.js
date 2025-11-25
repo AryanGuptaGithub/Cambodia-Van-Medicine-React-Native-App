@@ -157,6 +157,16 @@ export const createProduct = async (product) => {
     return res.data;
 };
 
+// _api.js
+export const updateProduct = async (product) => {
+    return fetch(`${BASE_URL}/products/${product.id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(product)
+    }).then(res => res.json());
+};
+
+
 // ----- SALES -----
 export const createSale = async (sale) => {
     const token = await AsyncStorage.getItem('userToken');
@@ -164,6 +174,17 @@ export const createSale = async (sale) => {
         headers: {Authorization: `Bearer ${token}`}
     });
     return res.data;
+};
+
+export const fetchZones = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    const res = await axios.get(`${BASE_URL}/zones`, {headers: {Authorization: `Bearer ${token}`}});
+    return res.data; // returns ["Zone A", "Zone B", ...]
+};
+export const fetchProvinces = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    const res = await axios.get(`${BASE_URL}/provinces`, {headers: {Authorization: `Bearer ${token}`}});
+    return res.data; // returns ["Phnom Penh", "Battambang", ...]
 };
 
 

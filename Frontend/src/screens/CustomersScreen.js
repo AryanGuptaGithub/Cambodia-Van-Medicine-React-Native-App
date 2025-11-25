@@ -1,34 +1,16 @@
 // src/screens/CustomersScreen.js
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import {FlatList, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../components/jsfiles/Header';
+import {_AppContext} from "../context/_AppContext";
 
 export default function CustomersScreen({navigation}) {
-    const [customers, setCustomers] = useState([]);
+    const {customers} = useContext(_AppContext);
+    // const [customers, setCustomers] = useState([]);
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState('all'); // all | pharmacy | hospital | clinic | distributor | agent
 
-    // Fetch customers for the logged-in user
-    useEffect(() => {
-        const fetchCustomers = async () => {
-            const token = await AsyncStorage.getItem('token');
-            if (!token) return;
-
-            try {
-                const response = await axios.get('https://sprightlier-deepwater-tanisha.ngrok-free.dev/api/customers', {
-                    headers: {Authorization: `Bearer ${token}`}, // Pass token in the Authorization header
-                });
-                setCustomers(response.data); // Set customers state with the fetched data
-            } catch (error) {
-                console.error("Failed to fetch customers:", error);
-            }
-        };
-
-        fetchCustomers();
-    }, []);
 
     const filteredCustomers = useMemo(() => {
         const q = search.trim().toLowerCase();

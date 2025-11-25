@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {_AppContext} from '../context/_AppContext';
 
 import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -24,35 +24,25 @@ import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 const Stack = createNativeStackNavigator();
 
 export default function MainStack() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const {user, loadingAuth} = useContext(_AppContext);
 
-    // Check authentication status when the component mounts
-    useEffect(() => {
-        const checkAuth = async () => {
-            const token = await AsyncStorage.getItem('token');
-            if (token) {
-                setIsAuthenticated(true);
-            } else {
-                setIsAuthenticated(false);
-            }
-        };
-
-        checkAuth();
-    }, []);
+    // While restoring auth from AsyncStorage, show nothing (or splash)
+    if (loadingAuth) {
+        return null; // You can return a splash screen here if you want
+    }
 
     return (
-        <Stack.Navigator
-            initialRouteName={isAuthenticated ? 'Home' : 'Login'} // Conditional route based on auth status
-            screenOptions={{headerShown: false}}
-        >
-            {/* 🔐 Authentication */}
-            <Stack.Screen name="Login" component={LoginScreen}/>
-            <Stack.Screen name="Register" component={RegisterScreen}/>
-            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
-
-            {/* App Screens - Protected Routes */}
-            {isAuthenticated && (
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+            {/* 🔐 Authentication Screens */}
+            {!user ? (
                 <>
+                    <Stack.Screen name="Login" component={LoginScreen}/>
+                    <Stack.Screen name="Register" component={RegisterScreen}/>
+                    <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
+                </>
+            ) : (
+                <>
+                    {/* App Screens - Protected Routes */}
                     <Stack.Screen name="Home" component={HomeScreen}/>
                     <Stack.Screen name="Customers" component={CustomersScreen}/>
                     <Stack.Screen name="AddCustomer" component={AddCustomerScreen}/>
