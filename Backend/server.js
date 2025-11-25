@@ -11,6 +11,9 @@ const productRoutes = require('./routes/products');
 const customerRoutes = require('./routes/customers');
 // const orderRoutes = require('./routes/orders');
 
+const miscRoutes = require('./routes/misc');
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -21,6 +24,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/customers', customerRoutes);
 // app.use('/api/orders', orderRoutes);
+
+app.use('/api', miscRoutes);
 
 app.get('/', (req, res) => res.json({ok: true, msg: 'Backend is live'}));
 

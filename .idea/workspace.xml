@@ -5,23 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="332184ee-779d-4907-9472-d79961b6fe90" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Backend/routes/customers.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/controllers/miscController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/models/Province.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/models/Zone.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/routes/misc.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/controllers/authController.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/controllers/authController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/config/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/config/db.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/controllers/customerController.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/controllers/customerController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/controllers/productController.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/controllers/productController.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/middleware/Auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/middleware/Auth.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/models/Customer.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/models/Customer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/models/User.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/models/User.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/routes/customers.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routes/customers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/routes/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routes/products.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/api/_api.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/api/_api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/navigation/MainStack.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/navigation/MainStack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/AddCustomerScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/AddCustomerScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/screens/CustomersScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/CustomersScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/screens/LoginScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/LoginScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/ProfileScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/ProfileScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/RegisterScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/RegisterScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,30 +58,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/ASUS/Documents/React_Native_App/Combodia_Hostpital_ReactNative_App&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ASUS\\Documents\\React_Native_App\\Combodia_Hostpital_ReactNative_App\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/ASUS/Documents/React_Native_App/Combodia_Hostpital_ReactNative_App",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "rearrange.code.on.save": "true",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Users\\ASUS\\Documents\\React_Native_App\\Combodia_Hostpital_ReactNative_App\\Frontend\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\ASUS\Documents\React_Native_App\Combodia_Hostpital_ReactNative_App\src\screens" />
@@ -111,11 +117,24 @@
       <workItem from="1763700142169" duration="14391000" />
       <workItem from="1763726951188" duration="2462000" />
       <workItem from="1763784671326" duration="1094000" />
-      <workItem from="1763964398651" duration="18429000" />
+      <workItem from="1763964398651" duration="18785000" />
+      <workItem from="1764042471956" duration="3582000" />
+      <workItem from="1764049066833" duration="17974000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/Backend/routes/products.js</url>
+          <line>1</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

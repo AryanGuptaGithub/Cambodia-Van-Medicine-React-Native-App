@@ -1,4 +1,4 @@
-// backend/middleware/authMiddleware.js
+// backend/middleware/Auth.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -16,14 +16,12 @@ exports.protect = async (req, res, next) => {
 
             // Attach the user information to the request
             req.user = await User.findById(decoded.id).select('-password');
-            next();
+            next();  // Proceed to the next middleware or route handler
         } catch (error) {
             console.error(error);
             res.status(401).json({message: 'Not authorized'});
         }
-    }
-
-    if (!token) {
+    } else {
         res.status(401).json({message: 'Not authorized, no token'});
     }
 };

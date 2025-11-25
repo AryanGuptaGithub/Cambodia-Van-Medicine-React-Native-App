@@ -1,10 +1,13 @@
-// backend/routes/customerRoutes.js
+// backend/routes/customers.js
 const express = require('express');
 const router = express.Router();
-const {getCustomers} = require('../controllers/customerController');
-const {protect} = require('../middleware/authMiddleware');  // To protect the route with authentication
+const {getCustomers, createCustomer, getzones, getprovinces} = require('../controllers/customerController');
+const {protect} = require('../middleware/Auth');
 
-// Route to get customers for the logged-in user
 router.get('/', protect, getCustomers);
+router.post('/', protect, createCustomer); // add this to allow frontend to create customer
+router.get('/zones', protect, getzones);
+router.get('/provinces', protect, getprovinces);
+
 
 module.exports = router;

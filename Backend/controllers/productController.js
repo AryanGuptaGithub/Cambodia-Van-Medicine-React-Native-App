@@ -1,15 +1,21 @@
 const Product = require('../models/Product');
 
+// Example for your list function:
 exports.list = async (req, res) => {
-    const {page = 1, limit = 50, q} = req.query;
-    const filter = q ? {name: new RegExp(q, 'i')} : {};
-    const products = await Product.find(filter)
-        .skip((page - 1) * limit)
-        .limit(Number(limit))
-        .lean();
-    const total = await Product.countDocuments(filter);
-    res.json({items: products, total, page: Number(page)});
+    try {
+        const {page = 1, limit = 50, q} = req.query;
+        const filter = q ? {name: new RegExp(q, 'i')} : {};
+        const products = await Product.find(filter)
+            .skip((page - 1) * limit)
+            .limit(Number(limit))
+            .lean();
+        const total = await Product.countDocuments(filter);
+        res.json({items: products, total, page: Number(page)});
+    } catch (error) {
+        res.status(500).json({message: error.message || 'Server Error'});
+    }
 };
+
 
 exports.get = async (req, res) => {
     const p = await Product.findById(req.params.id);
