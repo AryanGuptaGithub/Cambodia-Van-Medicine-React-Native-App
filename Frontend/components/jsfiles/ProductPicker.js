@@ -42,29 +42,33 @@ export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, 
         if (onAddProduct) {
             Object.values(selectedProducts).forEach(prod => {
                 const safeProd = {
-                    id: String(prod.id || ''),
-                    name: String(prod.name || ''),
-                    price: Number(prod.price || prod.sellingPrice || 0) || 0,
-                    qty: Number(prod.qty || 1) || 1,
+                    id: String(prod.id ?? prod._id ?? Math.random()),
+                    name: prod.name || prod.productName || prod.title || 'Unknown',
+                    price: Number(prod.price ?? prod.sellingPrice ?? 0),
+                    qty: Number(prod.qty || 1),
                 };
+
                 console.log('Sending to cart:', safeProd);
                 onAddProduct(safeProd, safeProd.qty);
             });
         }
         onClose && onClose();
     };
-    ``
+
 
     const renderProduct = ({item}) => (
         <View style={styles.row}>
             <View style={{flex: 1}}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.meta}>${item.sellingPrice} • Stock: {item.stock}</Text>
+                <Text style={styles.name}>{item.name || item.productName || item.title || 'Unknown'}</Text>
+                <Text style={styles.meta}>${item.sellingPrice ?? item.price ?? 0} • Stock: {item.stock ?? 0}</Text>
             </View>
             <TextInput
                 keyboardType="numeric"
-                value={qtyMap[String(item.id)] ?? '1'}
-                onChangeText={v => setQtyMap(prev => ({...prev, [String(item.id)]: v.replace(/[^0-9]/g, '')}))}
+                value={qtyMap[String(item.id ?? item._id)] ?? '1'}
+                onChangeText={v => setQtyMap(prev => ({
+                    ...prev,
+                    [String(item.id ?? item._id)]: v.replace(/[^0-9]/g, '')
+                }))}
                 style={styles.qtyBox}
             />
             <TouchableOpacity
@@ -72,23 +76,24 @@ export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, 
                     // toggle selection locally
                     setSelectedProducts(prev => {
                         const newSelected = {...prev};
-                        if (newSelected[String(item.id)]) {
-                            delete newSelected[String(item.id)]; // remove if already selected
+                        if (newSelected[String(item.id ?? item._id)]) {
+                            delete newSelected[String(item.id ?? item._id)]; // remove if already selected
                         } else {
-                            const qty = Math.max(1, parseInt(qtyMap[String(item.id)] || '1', 10));
-                            newSelected[String(item.id)] = {
-                                id: String(item.id),
-                                name: String(item.name || ''),
-                                price: Number(item.sellingPrice || 0),
+                            const qty = Math.max(1, parseInt(qtyMap[String(item.id ?? item._id)] || '1', 10));
+                            newSelected[String(item.id ?? item._id)] = {
+                                id: String(item.id ?? item._id ?? Math.random()),
+                                name: item.name || item.productName || item.title || 'Unknown',
+                                price: Number(item.sellingPrice ?? item.price ?? 0),
                                 qty,
                             };
+
                         }
                         return newSelected;
                     });
                 }}
                 style={{padding: 4, marginLeft: 8}}
             >
-                {selectedProducts[String(item.id)] ? (
+                {selectedProducts[String(item.id ?? item._id)] ? (
                     <FontAwesomeIcon icon={faCheckCircle} size={24} color="green"/>
                 ) : (
                     <Text style={{color: '#059669', fontWeight: '700', fontSize: 15}}>Add</Text>
@@ -131,7 +136,7 @@ export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, 
                     {/* Product List */}
                     <FlatList
                         data={list}
-                        keyExtractor={item => String(item.id)}
+                        keyExtractor={item => String(item.id ?? item._id ?? Math.random())}
                         renderItem={renderProduct}
                         contentContainerStyle={{paddingBottom: 12}}
                         keyboardShouldPersistTaps="handled"

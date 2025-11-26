@@ -16,14 +16,23 @@ export default function ProductsScreen({navigation}) {
     const filteredProducts = useMemo(() => {
         const q = search.trim().toLowerCase();
 
+        const TYPE_MAP = {
+            tablet: 'Tab',
+            capsule: 'Cap',
+            syrup: 'Syrup',
+            injection: 'Injection',
+            cream: 'Cream',
+        };
+
+
         return products
             .slice()
             .filter((p) => {
                 // type filter
                 if (typeFilter !== 'all') {
-                    const t = (p.type || '').toLowerCase();
-                    if (!t.includes(typeFilter)) return false;
+                    if (p.type !== TYPE_MAP[typeFilter]) return false;
                 }
+
 
                 if (!q) return true;
 
@@ -50,7 +59,7 @@ export default function ProductsScreen({navigation}) {
         return (
             <TouchableOpacity
                 onPress={() =>
-                    navigation.navigate('ProductDetails', {productId: item.id})
+                    navigation.navigate('ProductDetails', {productId: item._id})
                 }
                 style={{
                     backgroundColor: '#fff',
@@ -71,7 +80,7 @@ export default function ProductsScreen({navigation}) {
                             }}
                             numberOfLines={2}
                         >
-                            {item.name}
+                            {item.productName}
                         </Text>
 
                         <Text style={{fontSize: 12, color: '#6b7280'}}>
@@ -228,14 +237,13 @@ export default function ProductsScreen({navigation}) {
             {/* Products list */}
             <FlatList
                 data={filteredProducts}
-                keyExtractor={(i) => String(i.id)}
+                keyExtractor={(i) => i._id}
                 contentContainerStyle={{
                     paddingHorizontal: 12,
                     paddingTop: 4,
                     paddingBottom: 20,
                 }}
                 renderItem={renderItem}
-
                 ListEmptyComponent={
                     <Text style={{padding: 12, color: '#6b7280'}}>
                         {products.length === 0
@@ -244,6 +252,7 @@ export default function ProductsScreen({navigation}) {
                     </Text>
                 }
             />
+
         </SafeAreaView>
     );
 }

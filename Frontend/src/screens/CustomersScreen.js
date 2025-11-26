@@ -161,7 +161,7 @@ export default function CustomersScreen({navigation}) {
 
             <FlatList
                 data={filteredCustomers}
-                keyExtractor={(i) => String(i.id)}
+                keyExtractor={(i, index) => String(i.customerCode || index)}
                 contentContainerStyle={{padding: 12, paddingTop: 4, paddingBottom: 20}}
                 renderItem={renderItem}
                 ListEmptyComponent={

@@ -3,14 +3,8 @@ const Product = require('../models/Product');
 // Example for your list function:
 exports.list = async (req, res) => {
     try {
-        const {page = 1, limit = 50, q} = req.query;
-        const filter = q ? {name: new RegExp(q, 'i')} : {};
-        const products = await Product.find(filter)
-            .skip((page - 1) * limit)
-            .limit(Number(limit))
-            .lean();
-        const total = await Product.countDocuments(filter);
-        res.json({items: products, total, page: Number(page)});
+        const products = await Product.find().lean();  // fetch all products
+        res.json(products); // just the array
     } catch (error) {
         res.status(500).json({message: error.message || 'Server Error'});
     }

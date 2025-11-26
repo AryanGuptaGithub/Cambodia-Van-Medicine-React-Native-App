@@ -28,14 +28,16 @@ export default function AddProductScreen({navigation}) {
         }
 
         const payload = {
+            id: Date.now().toString(), // temporary unique id
             name: form.name.trim(),
             type: form.type.trim() || 'Tablet',
             stock: Number(form.stock) || 0,
             sellingPrice: Number(form.sellingPrice) || 0,
             purchasingPrice: Number(form.purchasingPrice) || 0,
             drugLicense: form.drugLicense.trim(),
-            validity: form.validity.trim(), // YYYY-MM-DD
+            validity: form.validity.trim(),
         };
+
 
         await addProduct(payload);
         navigation.goBack();

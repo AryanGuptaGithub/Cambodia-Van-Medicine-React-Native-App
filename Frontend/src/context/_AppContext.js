@@ -64,10 +64,8 @@ export const AppProvider = ({children}) => {
                 }
 
                 const remoteProducts = await api.fetchProducts();
-                if (Array.isArray(remoteProducts)) {
-                    setProducts(remoteProducts);
-                    await AsyncStorage.setItem('products', JSON.stringify(remoteProducts));
-                }
+                setProducts(Array.isArray(remoteProducts) ? remoteProducts : []);
+
             } catch (err) {
                 console.log('API fetch error (ok if offline):', err.message);
             }
@@ -238,7 +236,7 @@ export const AppProvider = ({children}) => {
                 login, logout,
                 customers, products, salesHistory,
                 addCustomer, addProduct, updateProduct,
-                decrementStock, incrementStock, addSaleRecord
+                decrementStock, incrementStock, createSale, addSaleRecord
             }}
         >
             {children}
