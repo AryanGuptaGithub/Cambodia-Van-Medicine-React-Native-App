@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Sale = require('../models/Sales'); // Make sure you create this model
-const authMiddleware = require('../middleware/auth'); // your auth middleware
+const {protect: authMiddleware} = require('../middleware/Auth'); // your auth middleware
 
 // Create a new sale
 router.post('/', async (req, res) => {
