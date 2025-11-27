@@ -97,4 +97,14 @@ export const fetchProvinces = async () => {
     return res.data; // returns ["Phnom Penh", "Battambang", ...]
 };
 
+export const fetchMySales = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    console.log('Token before fetching sales:', token); // <-- debug
+    const res = await axios.get(`${BASE_URL}/sales/my`, {
+        headers: {Authorization: `Bearer ${token}`}
+    });
+    return res.data.sales;
+};
+
+
 

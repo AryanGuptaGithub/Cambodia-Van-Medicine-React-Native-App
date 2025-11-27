@@ -31,6 +31,22 @@ export const AppProvider = ({children}) => {
     }, []);
 
 
+    useEffect(() => {
+        if (!user) return; // wait until user is loaded
+        (async () => {
+            try {
+                const mySales = await api.fetchMySales();
+                if (Array.isArray(mySales)) {
+                    setSalesHistory(mySales);
+                    await AsyncStorage.setItem('salesHistory', JSON.stringify(mySales));
+                }
+            } catch (err) {
+                console.log('Could not fetch my sales from backend, using local cache:', err.message);
+            }
+        })();
+    }, [user]);
+
+
     const login = async (userData, token) => {
         await AsyncStorage.setItem("userToken", token);
         await AsyncStorage.setItem("user", JSON.stringify(userData));
@@ -220,55 +236,68 @@ export const AppProvider = ({children}) => {
     // Create a sale record
 
     // Create a sale record
-    const createSale = async (saleData) => {
+    // Replace the createSale function in _AppContext.js with this fixed version:
+
+    const createSale = async ({selectedProducts, selectedCustomer, totalPaid, totalDue, remark = ''}) => {
         try {
-            // 1️⃣ Build sale payload for backend
-            const sale = {
-                invoiceNumber: saleData.invoiceNumber,
-                mrName: saleData.mrName,
-                mrId: saleData.mrId,
-                customerName: saleData.customerName,
-                customerId: saleData.customerId,
-                products: (saleData.items || []).map(i => ({
-                    productName: i.name || i.productName || 'Unknown',
-                    salesQty: Number(i.qty || i.salesQty || 0),
-                    bonusQty: Number(i.bonusQty || 0),
-                    totalQty: Number(i.qty || i.salesQty || 0) + Number(i.bonusQty || 0),
-                    sellingPrice: Number(i.price || i.sellingPrice || 0),
-                    amount: Number((Number(i.qty || i.salesQty || 0) * Number(i.price || i.sellingPrice || 0)).toFixed(2)),
-                    discount: Number(i.discount || 0),
-                    netSellingAmount: Number(i.netAmount || i.amount || 0),
-                    averageUnitPrice: Number(i.avgUnitPrice || 0),
-                    lc: Number(i.lc || 0),
-                    profitLoss: Number(i.profitLoss || 0),
-                    isProductAccept: i.isProductAccept ?? true
-                })),
-                totalAmount: Number(saleData.totalAmount || 0),
-                paidAmount: Number(saleData.paidAmount || 0),
-                dueAmount: Number(saleData.dueAmount || 0),
-                paymentStatus: saleData.paymentStatus || 'Cash',
-                remark: saleData.remark || '',
-                createdAt: new Date().toISOString()
+            if (!selectedCustomer || !selectedCustomer.id) {
+                throw new Error('Please select a customer.');
+            }
+
+            if (!selectedProducts || Object.keys(selectedProducts).length === 0) {
+                throw new Error('No products selected.');
+            }
+
+            // 1️⃣ Convert selectedProducts object to array - KEEP THE ID
+            const productsArray = Object.values(selectedProducts).map(p => ({
+                id: p.id, // ✅ FIXED: Keep the ID for stock updates
+                productName: p.name,
+                salesQty: Number(p.qty),
+                bonusQty: 0,
+                totalQty: Number(p.qty),
+                sellingPrice: Number(p.price),
+                amount: Number((p.price * p.qty).toFixed(2)),
+                discount: 0,
+                netSellingAmount: Number((p.price * p.qty).toFixed(2))
+            }));
+
+            // 2️⃣ Build final sale record (without id in products for backend)
+            const saleRecord = {
+                invoiceNumber: `INV-${Date.now()}`,
+                mrName: user?.name || 'Unknown',
+                mrId: user?.id || user?._id || 'unknown',
+                customerName: selectedCustomer.name,
+                customerId: selectedCustomer.id,
+                products: productsArray.map(({id, ...rest}) => rest), // Remove id for backend
+                totalAmount: Number(productsArray.reduce((sum, p) => sum + p.netSellingAmount, 0).toFixed(2)),
+                paidAmount: Number(totalPaid.toFixed(2)),
+                dueAmount: Number(totalDue.toFixed(2)),
+                paymentStatus: 'Cash',
+                remark
             };
 
-            console.log('Final saleRecord:', sale);
+            console.log('Final saleRecord:', saleRecord);
 
-            // 2️⃣ Save locally first
-            const updatedHistory = [sale, ...salesHistory];
+            // 3️⃣ Save locally
+            const updatedHistory = [saleRecord, ...salesHistory];
             setSalesHistory(updatedHistory);
             await AsyncStorage.setItem('salesHistory', JSON.stringify(updatedHistory));
 
-            // 3️⃣ Update stock locally
-            const stockItems = sale.products.map(p => ({id: p.id, quantity: p.salesQty}));
+            // 4️⃣ Update stock locally - NOW WITH CORRECT IDs
+            const stockItems = productsArray.map(p => ({
+                id: p.id,
+                quantity: p.salesQty
+            }));
+            console.log('Decrementing stock for:', stockItems); // Debug log
             await decrementStock(stockItems);
 
-            // 4️⃣ Send to backend
-            const backendSale = await api.createSale(sale);
+            // 5️⃣ Send to backend
+            const backendSale = await api.createSale(saleRecord);
             console.log('Sale saved to backend:', backendSale);
 
             return backendSale;
         } catch (err) {
-            console.error('Failed to create sale:', err.response?.data || err.message);
+            console.error('Failed to create sale:', err.response?.data || err.message || err);
             throw err;
         }
     };

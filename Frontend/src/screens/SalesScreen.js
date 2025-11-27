@@ -12,15 +12,17 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 export default function SalesScreen({navigation}) {
     const {customers, products, createSale} = useContext(_AppContext);
 
-    const [user, setUser] = useState(null); // fetch logged-in user
+    const [user, setUser] = useState(null);
     const [saleData, setSaleData] = useState({
-        customer: "",
+        customer: null,
         invoiceNumber: "INV-" + Date.now(),
         discount: "0",
         deposit: "0",
         paymentType: "Cash",
         paidAmount: "0",
         remark: "",
+        creditDays: "0",
+        deliveryDate: null,
     });
 
     const [cart, setCart] = useState([]);
@@ -30,57 +32,54 @@ export default function SalesScreen({navigation}) {
     const [editingQty, setEditingQty] = useState("1");
     const [editingModalVisible, setEditingModalVisible] = useState(false);
 
+    // ---------------- LOAD USER ----------------
     useEffect(() => {
-        console.log("useEffect running");
         const loadUser = async () => {
             try {
                 const storedUser = await AsyncStorage.getItem("user");
-                console.log("Stored user:", storedUser);
-                if (storedUser) {
-                    setUser(JSON.parse(storedUser));
-                } else {
-                    Alert.alert("Error", "User not found. Please login again.");
-                }
+                if (storedUser) setUser(JSON.parse(storedUser));
+                else Alert.alert("Error", "User not found. Please login again.");
             } catch (err) {
                 console.error("Failed to load user:", err);
                 Alert.alert("Error", "Failed to load user.");
             }
         };
-
         loadUser();
     }, []);
 
-
-    console.log("SalesScreen mounted");
-
-
     // ---------------- CALCULATIONS ----------------
-    const subtotal = useMemo(
-        () =>
-            cart.reduce((sum, item) => {
-                return sum + Number(item.price) * Number(item.quantity);
-            }, 0),
-        [cart]
-    );
+    const totals = useMemo(() => {
+        const subtotal = cart.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+        );
+        const discount = Number(saleData.discount) || 0;
+        const deposit = Number(saleData.deposit) || 0;
+        const paidAmount = Number(saleData.paidAmount) || 0;
+        const subtotalAfterDiscount = subtotal * (1 - discount / 100);
+        const vatAmount = subtotalAfterDiscount * 0.1;
+        const grandTotal = subtotalAfterDiscount + vatAmount;
+        const balance = grandTotal - deposit - paidAmount;
 
-    const discountNumeric = Number(saleData.discount) || 0;
-    const depositNumeric = Number(saleData.deposit) || 0;
-    const vatRate = 0.1;
-
-    const subtotalAfterDiscount = subtotal * (1 - discountNumeric / 100);
-    const vatAmount = subtotalAfterDiscount * vatRate;
-
-    const greenTotal = subtotalAfterDiscount + vatAmount;
-    const balanceAmount =
-        greenTotal - depositNumeric - (Number(saleData.paidAmount) || 0);
+        return {subtotal, subtotalAfterDiscount, vatAmount, grandTotal, balance};
+    }, [cart, saleData.discount, saleData.deposit, saleData.paidAmount]);
 
     // ---------------- HANDLERS ----------------
     const handleSelectCustomer = (customer) => {
-        setSaleData((prev) => ({...prev, customer}));
+
+
+        // ✅ Normalize: ensure customer has 'id' field (handle both 'id' and '_id')
+        const normalizedCustomer = {
+            ...customer,
+            id: customer.id || customer._id
+        };
+
+
+        setSaleData((prev) => ({...prev, customer: normalizedCustomer}));
         setCustomerPickerVisible(false);
     };
 
-    const addProductToCart = (product, qty) => {
+    const addProductToCart = (product, qty = 1) => {
         const id = String(product.id);
         const quantity = Math.max(1, Number(qty) || 1);
         const existing = cart.find((p) => p.id === id);
@@ -94,12 +93,7 @@ export default function SalesScreen({navigation}) {
         } else {
             setCart((prev) => [
                 ...prev,
-                {
-                    id,
-                    productName: product.name,
-                    price: Number(product.price),
-                    quantity,
-                },
+                {id, productName: product.name, price: Number(product.price), quantity},
             ]);
         }
     };
@@ -126,71 +120,70 @@ export default function SalesScreen({navigation}) {
     };
 
     const completeSale = async () => {
-        if (!user || !(user._id || user.id)) {
+        console.log('=== SALE COMPLETION DEBUG ===');
+        console.log('User:', user);
+        console.log('Customer selected:', saleData.customer);
+        console.log('Customer ID:', saleData.customer?.id);
+        console.log('Cart:', cart);
+
+        if (!user || !(user._id || user.id))
             return Alert.alert("Error", "User not loaded. Cannot complete sale.");
+
+        const customerId = saleData.customer?.id || saleData.customer?._id;
+        if (!saleData.customer || !customerId) {
+            console.log("❌ No customer selected or missing ID");
+            return Alert.alert("Error", "Please select a customer.");
         }
 
-        if (!saleData.customer || !saleData.customer._id)
-            return Alert.alert("Select customer");
-        if (cart.length === 0) return Alert.alert("Cart is empty");
+        if (cart.length === 0) return Alert.alert("Error", "Cart is empty");
 
-        // ---------------- CONSTRUCT SALE RECORD ----------------
-        const saleRecord = {
-            invoiceNumber: saleData.invoiceNumber,
-            mrName: saleData.mrName,
-            mrId: saleData.mrId,
-            customerName: saleData.customerName,
-            customerId: saleData.customerId,
-            products: (saleData.items || []).map(i => ({
-                productName: i.name || i.productName || 'Unknown',
-                salesQty: Number(i.qty || i.salesQty || 0),
-                bonusQty: Number(i.bonusQty || 0),
-                totalQty: Number(i.qty || i.salesQty || 0) + Number(i.bonusQty || 0),
-                sellingPrice: Number(i.price || i.sellingPrice || 0),
-                amount: Number((i.qty * i.price || 0).toFixed(2)),
-                discount: Number(i.discount || 0),
-                netSellingAmount: Number(i.netAmount || i.amount || 0),
-                averageUnitPrice: Number(i.avgUnitPrice || 0),
-                lc: Number(i.lc || 0),
-                profitLoss: Number(i.profitLoss || 0),
-                isProductAccept: i.isProductAccept ?? true
-            })),
-            totalAmount: Number(saleData.totalAmount || 0),
-            paidAmount: Number(saleData.paidAmount || 0),
-            dueAmount: Number(saleData.dueAmount || 0),
-            paymentStatus: saleData.paymentStatus || 'Cash',
-            remark: saleData.remark || ''
-        };
+        const selectedProducts = {};
+        cart.forEach((item) => {
+            selectedProducts[item.id] = {
+                id: item.id,
+                name: item.productName,
+                price: item.price,
+                qty: item.quantity,
+                bonusQty: 0,           // ✅ Can be enhanced to let users input bonus
+                discount: 0,           // ✅ Can be enhanced for per-product discount
+                costPrice: 0,          // ✅ If available from product data
+            };
+        });
 
+        console.log('Selected Products:', selectedProducts);
 
         try {
-            console.log("Final saleRecord:", JSON.stringify(saleRecord, null, 2));
+            await createSale({
+                selectedCustomer: {
+                    ...saleData.customer,
+                    id: customerId
+                },
+                selectedProducts,
+                totalPaid: Number(saleData.paidAmount) || 0,
+                totalDue: totals.grandTotal - (Number(saleData.deposit) || 0) - (Number(saleData.paidAmount) || 0),
+                remark: saleData.remark || "",
+                creditDays: Number(saleData.creditDays) || 0,        // ✅ NEW
+                deliveryDate: saleData.deliveryDate || new Date(),   // ✅ NEW
+                discount: Number(saleData.discount) || 0,
+            });
 
-            const response = await createSale(saleRecord);
+            Alert.alert("Sale Completed", `Invoice: ${saleData.invoiceNumber}`);
 
-            if (response?.ok === false) {
-                console.error("Backend error:", response);
-                return Alert.alert(
-                    "Error",
-                    "Failed to save sale. Check console for details."
-                );
-            }
-
-            Alert.alert("Sale Completed", "Invoice: " + saleData.invoiceNumber);
-
-            // ---------------- RESET FORM ----------------
+            // Reset
             setCart([]);
             setSaleData({
-                customer: "",
+                customer: null,
                 invoiceNumber: "INV-" + Date.now(),
                 discount: "0",
                 deposit: "0",
                 paymentType: "Cash",
                 paidAmount: "0",
                 remark: "",
+                creditDays: "0",
+                deliveryDate: null,
             });
         } catch (error) {
-            console.error("Failed to save sale:", error);
+            console.error("Failed to save sale:", error?.message || error);
             Alert.alert("Error", "Failed to save sale. Check console for details.");
         }
     };
@@ -242,7 +235,6 @@ export default function SalesScreen({navigation}) {
                 {/* PRODUCTS CARD */}
                 <View style={{backgroundColor: "#fff", marginTop: 12, padding: 12, borderRadius: 12}}>
                     <Text style={{fontWeight: "700"}}>Products</Text>
-
                     <TouchableOpacity
                         onPress={openProductPicker}
                         style={{
@@ -281,8 +273,13 @@ export default function SalesScreen({navigation}) {
                                     <Text style={{fontWeight: "600", marginTop: 6}}>
                                         ₹{(item.price * item.quantity).toFixed(2)}
                                     </Text>
-                                    <View style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 8}}>
-                                        <TouchableOpacity onPress={() => openEditItem(item)} style={{marginRight: 15}}>
+                                    <View
+                                        style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 8}}
+                                    >
+                                        <TouchableOpacity
+                                            onPress={() => openEditItem(item)}
+                                            style={{marginRight: 15}}
+                                        >
                                             <FontAwesome5 name="edit" size={18} color="#059669"/>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => removeFromCart(item.id)}>
@@ -301,7 +298,7 @@ export default function SalesScreen({navigation}) {
 
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Subtotal</Text>
-                        <Text>₹{subtotal.toFixed(2)}</Text>
+                        <Text>₹{totals.subtotal.toFixed(2)}</Text>
                     </View>
 
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
@@ -310,13 +307,15 @@ export default function SalesScreen({navigation}) {
                             style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             keyboardType="numeric"
                             value={saleData.discount}
-                            onChangeText={(v) => setSaleData({...saleData, discount: v})}
+                            onChangeText={(v) =>
+                                setSaleData({...saleData, discount: v.replace(/[^0-9.]/g, "")})
+                            }
                         />
                     </View>
 
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>VAT (10%)</Text>
-                        <Text>₹{vatAmount.toFixed(2)}</Text>
+                        <Text>₹{totals.vatAmount.toFixed(2)}</Text>
                     </View>
 
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
@@ -325,7 +324,43 @@ export default function SalesScreen({navigation}) {
                             style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             keyboardType="numeric"
                             value={saleData.deposit}
-                            onChangeText={(v) => setSaleData({...saleData, deposit: v})}
+                            onChangeText={(v) =>
+                                setSaleData({...saleData, deposit: v.replace(/[^0-9.]/g, "")})
+                            }
+                        />
+                    </View>
+
+                    {/* CREDIT DAYS */}
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
+                        <Text>Credit Days</Text>
+                        <TextInput
+                            style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
+                            keyboardType="numeric"
+                            value={saleData.creditDays}
+                            onChangeText={(v) =>
+                                setSaleData({...saleData, creditDays: v.replace(/[^0-9]/g, "")})
+                            }
+                            placeholder="0"
+                        />
+                    </View>
+
+                    {/* REMARK */}
+                    <View style={{marginTop: 10}}>
+                        <Text>Remark</Text>
+                        <TextInput
+                            style={{
+                                borderWidth: 1,
+                                padding: 8,
+                                borderRadius: 8,
+                                marginTop: 6,
+                                minHeight: 60,
+                                textAlignVertical: 'top'
+                            }}
+                            multiline
+                            numberOfLines={3}
+                            value={saleData.remark}
+                            onChangeText={(v) => setSaleData({...saleData, remark: v})}
+                            placeholder="Add any notes or remarks..."
                         />
                     </View>
 
@@ -359,7 +394,9 @@ export default function SalesScreen({navigation}) {
                             style={{width: 100, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             value={saleData.paidAmount}
                             keyboardType="numeric"
-                            onChangeText={(v) => setSaleData({...saleData, paidAmount: v})}
+                            onChangeText={(v) =>
+                                setSaleData({...saleData, paidAmount: v.replace(/[^0-9.]/g, "")})
+                            }
                         />
                     </View>
 
@@ -367,7 +404,7 @@ export default function SalesScreen({navigation}) {
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Balance</Text>
                         <Text style={{fontWeight: "700", color: "#b91c1c"}}>
-                            ₹{balanceAmount.toFixed(2)}
+                            ₹{totals.balance.toFixed(2)}
                         </Text>
                     </View>
 
@@ -375,7 +412,7 @@ export default function SalesScreen({navigation}) {
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text style={{fontWeight: "700"}}>Grand Total</Text>
                         <Text style={{fontWeight: "700", color: "#059669", fontSize: 18}}>
-                            ₹{greenTotal.toFixed(2)}
+                            ₹{totals.grandTotal.toFixed(2)}
                         </Text>
                     </View>
 
@@ -386,7 +423,7 @@ export default function SalesScreen({navigation}) {
                             backgroundColor: "#059669",
                             padding: 14,
                             borderRadius: 12,
-                            alignItems: "center"
+                            alignItems: "center",
                         }}
                     >
                         <Text style={{color: "#fff", fontWeight: "700"}}>Complete Sale</Text>
@@ -413,12 +450,14 @@ export default function SalesScreen({navigation}) {
             {/* EDIT QUANTITY MODAL */}
             <Modal visible={editingModalVisible} transparent animationType="slide">
                 <View style={{flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.4)"}}>
-                    <View style={{
-                        backgroundColor: "#fff",
-                        padding: 16,
-                        borderTopLeftRadius: 12,
-                        borderTopRightRadius: 12
-                    }}>
+                    <View
+                        style={{
+                            backgroundColor: "#fff",
+                            padding: 16,
+                            borderTopLeftRadius: 12,
+                            borderTopRightRadius: 12,
+                        }}
+                    >
                         <Text style={{fontWeight: "700"}}>Edit Quantity – {editingItem?.productName}</Text>
 
                         <View style={{flexDirection: "row", justifyContent: "center", marginTop: 20}}>
@@ -438,7 +477,7 @@ export default function SalesScreen({navigation}) {
                                     borderWidth: 1,
                                     textAlign: "center",
                                     padding: 8,
-                                    borderRadius: 8
+                                    borderRadius: 8,
                                 }}
                                 value={editingQty}
                                 keyboardType="numeric"
@@ -464,7 +503,7 @@ export default function SalesScreen({navigation}) {
                                     padding: 12,
                                     backgroundColor: "#e5e7eb",
                                     borderRadius: 8,
-                                    alignItems: "center"
+                                    alignItems: "center",
                                 }}
                             >
                                 <Text>Cancel</Text>
@@ -477,7 +516,7 @@ export default function SalesScreen({navigation}) {
                                     padding: 12,
                                     backgroundColor: "#059669",
                                     borderRadius: 8,
-                                    alignItems: "center"
+                                    alignItems: "center",
                                 }}
                             >
                                 <Text style={{color: "#fff"}}>Save</Text>
