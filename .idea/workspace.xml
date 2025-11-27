@@ -7,12 +7,8 @@
     <list default="true" id="332184ee-779d-4907-9472-d79961b6fe90" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/controllers/productController.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/controllers/productController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/components/jsfiles/ProductPicker.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/components/jsfiles/ProductPicker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/api/_api.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/api/_api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/AddProductScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/AddProductScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/CustomersScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/CustomersScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/ProductsScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/ProductsScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/SalesScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/SalesScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +101,8 @@
       <workItem from="1763964398651" duration="18785000" />
       <workItem from="1764042471956" duration="3582000" />
       <workItem from="1764049066833" duration="18256000" />
-      <workItem from="1764136181280" duration="14696000" />
+      <workItem from="1764136181280" duration="15097000" />
+      <workItem from="1764214230740" duration="3327000" />
     </task>
     <servers />
   </component>

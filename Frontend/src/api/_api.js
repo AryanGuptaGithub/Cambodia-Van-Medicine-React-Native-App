@@ -146,7 +146,13 @@ export const fetchProducts = async () => {
     const res = await axios.get(`${BASE_URL}/products`, {
         headers: {Authorization: `Bearer ${token}`}
     });
-    return res.data;
+
+    // always return an array
+    if (Array.isArray(res.data)) return res.data;
+    if (Array.isArray(res.data?.products)) return res.data.products;
+    if (Array.isArray(res.data?.data)) return res.data.data;
+
+    return [];
 };
 
 export const createProduct = async (product) => {

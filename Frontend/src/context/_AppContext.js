@@ -53,7 +53,20 @@ export const AppProvider = ({children}) => {
                 const sh = await AsyncStorage.getItem('salesHistory');
 
                 if (cu) setCustomers(JSON.parse(cu));
-                if (pr) setProducts(JSON.parse(pr) || []);
+                if (pr) {
+                    const parsed = JSON.parse(pr);
+
+                    const normalized = Array.isArray(parsed)
+                        ? parsed
+                        : Array.isArray(parsed?.products)
+                            ? parsed.products
+                            : Array.isArray(parsed?.data)
+                                ? parsed.data
+                                : [];
+
+                    setProducts(normalized);
+                }
+
                 if (sh) setSalesHistory(JSON.parse(sh));
 
                 // Fetch remote data
@@ -64,7 +77,22 @@ export const AppProvider = ({children}) => {
                 }
 
                 const remoteProducts = await api.fetchProducts();
-                setProducts(Array.isArray(remoteProducts) ? remoteProducts : []);
+                console.log("REMOTE PRODUCTS RAW RESPONSE:", remoteProducts);
+
+
+                let normalized = [];
+
+                if (Array.isArray(remoteProducts)) {
+                    normalized = remoteProducts;
+                } else if (Array.isArray(remoteProducts?.products)) {
+                    normalized = remoteProducts.products;
+                } else if (remoteProducts?.data && Array.isArray(remoteProducts.data)) {
+                    normalized = remoteProducts.data;
+                }
+
+                setProducts(normalized);
+                await AsyncStorage.setItem('products', JSON.stringify(normalized));
+
 
             } catch (err) {
                 console.log('API fetch error (ok if offline):', err.message);

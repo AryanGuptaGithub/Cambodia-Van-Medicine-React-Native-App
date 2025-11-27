@@ -1,4 +1,4 @@
-const Product = require('../models/Product');
+const Product = require('../models/product');
 
 // Example for your list function:
 exports.list = async (req, res) => {
