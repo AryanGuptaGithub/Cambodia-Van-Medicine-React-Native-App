@@ -25,9 +25,10 @@ export default function ProductDetailsScreen({navigation, route}) {
     // find product either via passed object or id
     const product = useMemo(() => {
         if (productParam) return productParam;
-        if (paramId) return products.find(p => String(p.id) === String(paramId));
+        if (paramId) return products.find(p => String(p._id) === String(paramId)); // use _id here
         return null;
     }, [productParam, paramId, products]);
+
 
     const [localStock, setLocalStock] = useState(
         product ? String(product.stock ?? 0) : '0'

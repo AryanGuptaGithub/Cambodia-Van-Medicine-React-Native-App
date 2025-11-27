@@ -42,16 +42,18 @@ export function ProductPicker({visible, onClose, onAddProduct, onUpdateProduct, 
         if (onAddProduct) {
             Object.values(selectedProducts).forEach(prod => {
                 const safeProd = {
-                    id: String(prod.id ?? prod._id ?? Math.random()),
+                    id: String(prod.id ?? prod._id), // remove Math.random()
                     name: prod.name || prod.productName || prod.title || 'Unknown',
                     price: Number(prod.price ?? prod.sellingPrice ?? 0),
                     qty: Number(prod.qty || 1),
                 };
 
+
                 console.log('Sending to cart:', safeProd);
                 onAddProduct(safeProd, safeProd.qty);
             });
         }
+
         onClose && onClose();
     };
 

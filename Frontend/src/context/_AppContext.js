@@ -77,7 +77,7 @@ export const AppProvider = ({children}) => {
                 }
 
                 const remoteProducts = await api.fetchProducts();
-                console.log("REMOTE PRODUCTS RAW RESPONSE:", remoteProducts);
+                // console.log("REMOTE PRODUCTS RAW RESPONSE:", remoteProducts);
 
 
                 let normalized = [];
@@ -218,35 +218,61 @@ export const AppProvider = ({children}) => {
     };
 
     // Create a sale record
+
+    // Create a sale record
     const createSale = async (saleData) => {
-        const sale = {
-            id: String(Date.now()),
-            invoice: saleData.invoice,
-            customerId: saleData.customerId,
-            customerName: saleData.customerName,
-            items: saleData.items,
-            discount: saleData.discount || 0,
-            vat: saleData.vat || 0,
-            greenTotal: saleData.greenTotal,
-            deposit: saleData.deposit || 0,
-            paidAmount: saleData.paidAmount || 0,
-            balanceAmount: saleData.balanceAmount,
-            returnsAmount: 0,
-            paymentType: saleData.paymentType || 'Cash',
-            createdAt: new Date().toISOString(),
-        };
+        try {
+            // 1️⃣ Build sale payload for backend
+            const sale = {
+                invoiceNumber: saleData.invoiceNumber,
+                mrName: saleData.mrName,
+                mrId: saleData.mrId,
+                customerName: saleData.customerName,
+                customerId: saleData.customerId,
+                products: (saleData.items || []).map(i => ({
+                    productName: i.name || i.productName || 'Unknown',
+                    salesQty: Number(i.qty || i.salesQty || 0),
+                    bonusQty: Number(i.bonusQty || 0),
+                    totalQty: Number(i.qty || i.salesQty || 0) + Number(i.bonusQty || 0),
+                    sellingPrice: Number(i.price || i.sellingPrice || 0),
+                    amount: Number((Number(i.qty || i.salesQty || 0) * Number(i.price || i.sellingPrice || 0)).toFixed(2)),
+                    discount: Number(i.discount || 0),
+                    netSellingAmount: Number(i.netAmount || i.amount || 0),
+                    averageUnitPrice: Number(i.avgUnitPrice || 0),
+                    lc: Number(i.lc || 0),
+                    profitLoss: Number(i.profitLoss || 0),
+                    isProductAccept: i.isProductAccept ?? true
+                })),
+                totalAmount: Number(saleData.totalAmount || 0),
+                paidAmount: Number(saleData.paidAmount || 0),
+                dueAmount: Number(saleData.dueAmount || 0),
+                paymentStatus: saleData.paymentStatus || 'Cash',
+                remark: saleData.remark || '',
+                createdAt: new Date().toISOString()
+            };
 
-        // Save to sales history
-        const updatedHistory = [sale, ...salesHistory];
-        setSalesHistory(updatedHistory);
-        await AsyncStorage.setItem('salesHistory', JSON.stringify(updatedHistory));
+            console.log('Final saleRecord:', sale);
 
-        // Update stock
-        const stockItems = sale.items.map(i => ({id: i.id, quantity: i.quantity}));
-        await decrementStock(stockItems);
+            // 2️⃣ Save locally first
+            const updatedHistory = [sale, ...salesHistory];
+            setSalesHistory(updatedHistory);
+            await AsyncStorage.setItem('salesHistory', JSON.stringify(updatedHistory));
 
-        return sale;
+            // 3️⃣ Update stock locally
+            const stockItems = sale.products.map(p => ({id: p.id, quantity: p.salesQty}));
+            await decrementStock(stockItems);
+
+            // 4️⃣ Send to backend
+            const backendSale = await api.createSale(sale);
+            console.log('Sale saved to backend:', backendSale);
+
+            return backendSale;
+        } catch (err) {
+            console.error('Failed to create sale:', err.response?.data || err.message);
+            throw err;
+        }
     };
+
 
     // Add sale record (wrapper for API + local)
     const addSaleRecord = async (sale) => {

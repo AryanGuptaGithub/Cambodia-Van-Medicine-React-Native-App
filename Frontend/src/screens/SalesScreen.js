@@ -1,6 +1,7 @@
-import React, {useContext, useMemo, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState} from "react";
 import {Alert, FlatList, Keyboard, Modal, ScrollView, Text, TextInput, TouchableOpacity, View,} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {_AppContext} from "../context/_AppContext";
 import Header from "../../components/jsfiles/Header";
@@ -11,9 +12,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 export default function SalesScreen({navigation}) {
     const {customers, products, createSale} = useContext(_AppContext);
 
-    // console.log("DEBUG CUSTOMERS:", customers);
-    // console.log("DEBUG PRODUCTS:", products);
-
+    const [user, setUser] = useState(null); // fetch logged-in user
     const [saleData, setSaleData] = useState({
         customer: "",
         invoiceNumber: "INV-" + Date.now(),
@@ -21,16 +20,39 @@ export default function SalesScreen({navigation}) {
         deposit: "0",
         paymentType: "Cash",
         paidAmount: "0",
+        remark: "",
     });
 
     const [cart, setCart] = useState([]);
-
     const [customerPickerVisible, setCustomerPickerVisible] = useState(false);
     const [productPickerVisible, setProductPickerVisible] = useState(false);
-
     const [editingItem, setEditingItem] = useState(null);
     const [editingQty, setEditingQty] = useState("1");
     const [editingModalVisible, setEditingModalVisible] = useState(false);
+
+    useEffect(() => {
+        console.log("useEffect running");
+        const loadUser = async () => {
+            try {
+                const storedUser = await AsyncStorage.getItem("user");
+                console.log("Stored user:", storedUser);
+                if (storedUser) {
+                    setUser(JSON.parse(storedUser));
+                } else {
+                    Alert.alert("Error", "User not found. Please login again.");
+                }
+            } catch (err) {
+                console.error("Failed to load user:", err);
+                Alert.alert("Error", "Failed to load user.");
+            }
+        };
+
+        loadUser();
+    }, []);
+
+
+    console.log("SalesScreen mounted");
+
 
     // ---------------- CALCULATIONS ----------------
     const subtotal = useMemo(
@@ -53,25 +75,20 @@ export default function SalesScreen({navigation}) {
         greenTotal - depositNumeric - (Number(saleData.paidAmount) || 0);
 
     // ---------------- HANDLERS ----------------
-
     const handleSelectCustomer = (customer) => {
-        // customer.id MUST be converted to string
-        setSaleData((prev) => ({...prev, customer: String(customer.id)}));
+        setSaleData((prev) => ({...prev, customer}));
         setCustomerPickerVisible(false);
     };
 
     const addProductToCart = (product, qty) => {
-        const id = String(product._id);
+        const id = String(product.id);
         const quantity = Math.max(1, Number(qty) || 1);
-
         const existing = cart.find((p) => p.id === id);
 
         if (existing) {
             setCart((prev) =>
                 prev.map((p) =>
-                    p.id === id
-                        ? {...p, quantity: p.quantity + quantity}
-                        : p
+                    p.id === id ? {...p, quantity: p.quantity + quantity} : p
                 )
             );
         } else {
@@ -79,8 +96,8 @@ export default function SalesScreen({navigation}) {
                 ...prev,
                 {
                     id,
-                    productName: product.productName,
-                    price: Number(product.sellingPrice),
+                    productName: product.name,
+                    price: Number(product.price),
                     quantity,
                 },
             ]);
@@ -99,60 +116,84 @@ export default function SalesScreen({navigation}) {
 
     const saveEditQty = () => {
         const newQty = Math.max(1, Number(editingQty));
-
         setCart((prev) =>
             prev.map((item) =>
                 item.id === editingItem.id ? {...item, quantity: newQty} : item
             )
         );
-
         setEditingModalVisible(false);
         setEditingItem(null);
     };
 
     const completeSale = async () => {
-        if (!saleData.customer) return Alert.alert("Select customer");
+        if (!user || !(user._id || user.id)) {
+            return Alert.alert("Error", "User not loaded. Cannot complete sale.");
+        }
 
+        if (!saleData.customer || !saleData.customer._id)
+            return Alert.alert("Select customer");
         if (cart.length === 0) return Alert.alert("Cart is empty");
 
-        const customerObj = customers.find(
-            (c) => String(c._id) === saleData.customer
-        );
-
+        // ---------------- CONSTRUCT SALE RECORD ----------------
         const saleRecord = {
-            invoice: saleData.invoiceNumber,
-            customerId: saleData.customer,
-            customerName: customerObj?.name || "Unknown",
-            items: cart,
-            subtotal,
-            discount: discountNumeric,
-            vat: vatAmount,
-            greenTotal,
-            deposit: depositNumeric,
-            paidAmount: Number(saleData.paidAmount),
-            balanceAmount,
-            paymentType: saleData.paymentType,
+            invoiceNumber: saleData.invoiceNumber,
+            mrName: saleData.mrName,
+            mrId: saleData.mrId,
+            customerName: saleData.customerName,
+            customerId: saleData.customerId,
+            products: (saleData.items || []).map(i => ({
+                productName: i.name || i.productName || 'Unknown',
+                salesQty: Number(i.qty || i.salesQty || 0),
+                bonusQty: Number(i.bonusQty || 0),
+                totalQty: Number(i.qty || i.salesQty || 0) + Number(i.bonusQty || 0),
+                sellingPrice: Number(i.price || i.sellingPrice || 0),
+                amount: Number((i.qty * i.price || 0).toFixed(2)),
+                discount: Number(i.discount || 0),
+                netSellingAmount: Number(i.netAmount || i.amount || 0),
+                averageUnitPrice: Number(i.avgUnitPrice || 0),
+                lc: Number(i.lc || 0),
+                profitLoss: Number(i.profitLoss || 0),
+                isProductAccept: i.isProductAccept ?? true
+            })),
+            totalAmount: Number(saleData.totalAmount || 0),
+            paidAmount: Number(saleData.paidAmount || 0),
+            dueAmount: Number(saleData.dueAmount || 0),
+            paymentStatus: saleData.paymentStatus || 'Cash',
+            remark: saleData.remark || ''
         };
 
-        await createSale(saleRecord);
 
-        Alert.alert("Sale Completed", "Invoice: " + saleData.invoiceNumber);
+        try {
+            console.log("Final saleRecord:", JSON.stringify(saleRecord, null, 2));
 
-        setCart([]);
+            const response = await createSale(saleRecord);
 
-        setSaleData({
-            customer: "",
-            invoiceNumber: "INV-" + Date.now(),
-            discount: "0",
-            deposit: "0",
-            paymentType: "Cash",
-            paidAmount: "0",
-        });
+            if (response?.ok === false) {
+                console.error("Backend error:", response);
+                return Alert.alert(
+                    "Error",
+                    "Failed to save sale. Check console for details."
+                );
+            }
+
+            Alert.alert("Sale Completed", "Invoice: " + saleData.invoiceNumber);
+
+            // ---------------- RESET FORM ----------------
+            setCart([]);
+            setSaleData({
+                customer: "",
+                invoiceNumber: "INV-" + Date.now(),
+                discount: "0",
+                deposit: "0",
+                paymentType: "Cash",
+                paidAmount: "0",
+                remark: "",
+            });
+        } catch (error) {
+            console.error("Failed to save sale:", error);
+            Alert.alert("Error", "Failed to save sale. Check console for details.");
+        }
     };
-
-    const selectedCustomerName =
-        customers.find((c) => String(c._id) === saleData.customer)?.name ||
-        "Select Customer";
 
     const openCustomerPicker = () => {
         Keyboard.dismiss();
@@ -163,6 +204,8 @@ export default function SalesScreen({navigation}) {
         Keyboard.dismiss();
         setTimeout(() => setProductPickerVisible(true), 50);
     };
+
+    const selectedCustomerName = saleData.customer?.name || "Select Customer";
 
     // ---------------- RENDER ----------------
     return (
@@ -175,29 +218,13 @@ export default function SalesScreen({navigation}) {
 
             <ScrollView style={{flex: 1, padding: 12}}>
                 {/* Invoice + Customer */}
-                <View
-                    style={{
-                        backgroundColor: "#fff",
-                        padding: 12,
-                        borderRadius: 12,
-                    }}
-                >
+                <View style={{backgroundColor: "#fff", padding: 12, borderRadius: 12}}>
                     <Text style={{fontWeight: "600"}}>Invoice Number</Text>
-
-                    <Text
-                        style={{
-                            backgroundColor: "#f3f4f6",
-                            padding: 10,
-                            borderRadius: 8,
-                        }}
-                    >
+                    <Text style={{backgroundColor: "#f3f4f6", padding: 10, borderRadius: 8}}>
                         {saleData.invoiceNumber}
                     </Text>
 
-                    <Text style={{marginTop: 10, fontWeight: "600"}}>
-                        Customer
-                    </Text>
-
+                    <Text style={{marginTop: 10, fontWeight: "600"}}>Customer</Text>
                     <TouchableOpacity
                         onPress={openCustomerPicker}
                         style={{
@@ -208,23 +235,12 @@ export default function SalesScreen({navigation}) {
                             borderRadius: 8,
                         }}
                     >
-                        <Text>
-                            {saleData.customer
-                                ? selectedCustomerName
-                                : "Select Customer"}
-                        </Text>
+                        <Text>{selectedCustomerName}</Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* PRODUCTS CARD */}
-                <View
-                    style={{
-                        backgroundColor: "#fff",
-                        marginTop: 12,
-                        padding: 12,
-                        borderRadius: 12,
-                    }}
-                >
+                <View style={{backgroundColor: "#fff", marginTop: 12, padding: 12, borderRadius: 12}}>
                     <Text style={{fontWeight: "700"}}>Products</Text>
 
                     <TouchableOpacity
@@ -239,9 +255,7 @@ export default function SalesScreen({navigation}) {
                             alignItems: "center",
                         }}
                     >
-                        <Text style={{color: "#166534", fontWeight: "600"}}>
-                            + Add Product
-                        </Text>
+                        <Text style={{color: "#166534", fontWeight: "600"}}>+ Add Product</Text>
                     </TouchableOpacity>
 
                     {cart.length === 0 ? (
@@ -250,7 +264,7 @@ export default function SalesScreen({navigation}) {
                         <FlatList
                             data={cart}
                             scrollEnabled={false}
-                            keyExtractor={(item) => String(item.id)} // FIXED KEY
+                            keyExtractor={(item) => String(item.id)}
                             renderItem={({item}) => (
                                 <View
                                     style={{
@@ -260,54 +274,19 @@ export default function SalesScreen({navigation}) {
                                         borderRadius: 8,
                                     }}
                                 >
-                                    <Text style={{fontWeight: "700"}}>
-                                        {item.productName}
-                                    </Text>
-
+                                    <Text style={{fontWeight: "700"}}>{item.productName}</Text>
                                     <Text style={{marginTop: 4}}>
-                                        Qty: {item.quantity} × ₹
-                                        {item.price}
+                                        Qty: {item.quantity} × ₹{item.price}
                                     </Text>
-
-                                    <Text
-                                        style={{
-                                            fontWeight: "600",
-                                            marginTop: 6,
-                                        }}
-                                    >
-                                        ₹{(item.price * item.quantity).toFixed(
-                                        2
-                                    )}
+                                    <Text style={{fontWeight: "600", marginTop: 6}}>
+                                        ₹{(item.price * item.quantity).toFixed(2)}
                                     </Text>
-
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            justifyContent: "flex-end",
-                                            marginTop: 8,
-                                        }}
-                                    >
-                                        <TouchableOpacity
-                                            onPress={() => openEditItem(item)}
-                                            style={{marginRight: 15}}
-                                        >
-                                            <FontAwesome5
-                                                name="edit"
-                                                size={18}
-                                                color="#059669"
-                                            />
+                                    <View style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 8}}>
+                                        <TouchableOpacity onPress={() => openEditItem(item)} style={{marginRight: 15}}>
+                                            <FontAwesome5 name="edit" size={18} color="#059669"/>
                                         </TouchableOpacity>
-
-                                        <TouchableOpacity
-                                            onPress={() =>
-                                                removeFromCart(item.id)
-                                            }
-                                        >
-                                            <FontAwesome5
-                                                name="trash"
-                                                size={18}
-                                                color="#b91c1c"
-                                            />
+                                        <TouchableOpacity onPress={() => removeFromCart(item.id)}>
+                                            <FontAwesome5 name="trash" size={18} color="#b91c1c"/>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -317,163 +296,75 @@ export default function SalesScreen({navigation}) {
                 </View>
 
                 {/* ORDER SUMMARY */}
-                <View
-                    style={{
-                        backgroundColor: "#fff",
-                        marginTop: 12,
-                        padding: 12,
-                        borderRadius: 12,
-                    }}
-                >
+                <View style={{backgroundColor: "#fff", marginTop: 12, padding: 12, borderRadius: 12}}>
                     <Text style={{fontWeight: "700"}}>Order Summary</Text>
 
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Subtotal</Text>
                         <Text>₹{subtotal.toFixed(2)}</Text>
                     </View>
 
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Discount (%)</Text>
                         <TextInput
-                            style={{
-                                width: 80,
-                                borderWidth: 1,
-                                padding: 6,
-                                textAlign: "right",
-                                borderRadius: 8,
-                            }}
+                            style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             keyboardType="numeric"
                             value={saleData.discount}
-                            onChangeText={(v) =>
-                                setSaleData({...saleData, discount: v})
-                            }
+                            onChangeText={(v) => setSaleData({...saleData, discount: v})}
                         />
                     </View>
 
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>VAT (10%)</Text>
                         <Text>₹{vatAmount.toFixed(2)}</Text>
                     </View>
 
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Deposit</Text>
                         <TextInput
-                            style={{
-                                width: 80,
-                                borderWidth: 1,
-                                padding: 6,
-                                textAlign: "right",
-                                borderRadius: 8,
-                            }}
+                            style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             keyboardType="numeric"
                             value={saleData.deposit}
-                            onChangeText={(v) =>
-                                setSaleData({...saleData, deposit: v})
-                            }
+                            onChangeText={(v) => setSaleData({...saleData, deposit: v})}
                         />
                     </View>
 
                     {/* PAYMENT TYPE */}
-                    <View
-                        style={{
-                            marginTop: 10,
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                        }}
-                    >
+                    <View style={{marginTop: 10, flexDirection: "row", justifyContent: "space-between"}}>
                         <Text>Payment Type</Text>
-
                         <View style={{flexDirection: "row", gap: 10}}>
-                            {["Cash", "Credit", "Partially Paid"].map(
-                                (type) => (
-                                    <TouchableOpacity
-                                        key={type}
-                                        onPress={() =>
-                                            setSaleData({
-                                                ...saleData,
-                                                paymentType: type,
-                                            })
-                                        }
-                                        style={{
-                                            paddingHorizontal: 10,
-                                            paddingVertical: 6,
-                                            borderRadius: 6,
-                                            borderWidth: 1,
-                                            borderColor:
-                                                saleData.paymentType === type
-                                                    ? "#059669"
-                                                    : "#ddd",
-                                            backgroundColor:
-                                                saleData.paymentType === type
-                                                    ? "#d1fae5"
-                                                    : "#fff",
-                                        }}
-                                    >
-                                        <Text>{type}</Text>
-                                    </TouchableOpacity>
-                                )
-                            )}
+                            {["Cash", "Credit"].map((type) => (
+                                <TouchableOpacity
+                                    key={type}
+                                    onPress={() => setSaleData({...saleData, paymentType: type})}
+                                    style={{
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 6,
+                                        borderRadius: 6,
+                                        borderWidth: 1,
+                                        borderColor: saleData.paymentType === type ? "#059669" : "#ddd",
+                                        backgroundColor: saleData.paymentType === type ? "#d1fae5" : "#fff",
+                                    }}
+                                >
+                                    <Text>{type}</Text>
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     </View>
 
                     {/* PAID AMOUNT */}
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Paid Amount</Text>
-
                         <TextInput
-                            style={{
-                                width: 100,
-                                borderWidth: 1,
-                                padding: 6,
-                                textAlign: "right",
-                                borderRadius: 8,
-                            }}
+                            style={{width: 100, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             value={saleData.paidAmount}
                             keyboardType="numeric"
-                            onChangeText={(v) =>
-                                setSaleData({...saleData, paidAmount: v})
-                            }
+                            onChangeText={(v) => setSaleData({...saleData, paidAmount: v})}
                         />
                     </View>
 
                     {/* BALANCE */}
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Balance</Text>
                         <Text style={{fontWeight: "700", color: "#b91c1c"}}>
                             ₹{balanceAmount.toFixed(2)}
@@ -481,21 +372,9 @@ export default function SalesScreen({navigation}) {
                     </View>
 
                     {/* GREEN TOTAL */}
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text style={{fontWeight: "700"}}>Grand Total</Text>
-                        <Text
-                            style={{
-                                fontWeight: "700",
-                                color: "#059669",
-                                fontSize: 18,
-                            }}
-                        >
+                        <Text style={{fontWeight: "700", color: "#059669", fontSize: 18}}>
                             ₹{greenTotal.toFixed(2)}
                         </Text>
                     </View>
@@ -507,12 +386,10 @@ export default function SalesScreen({navigation}) {
                             backgroundColor: "#059669",
                             padding: 14,
                             borderRadius: 12,
-                            alignItems: "center",
+                            alignItems: "center"
                         }}
                     >
-                        <Text style={{color: "#fff", fontWeight: "700"}}>
-                            Complete Sale
-                        </Text>
+                        <Text style={{color: "#fff", fontWeight: "700"}}>Complete Sale</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -535,41 +412,21 @@ export default function SalesScreen({navigation}) {
 
             {/* EDIT QUANTITY MODAL */}
             <Modal visible={editingModalVisible} transparent animationType="slide">
-                <View
-                    style={{
-                        flex: 1,
-                        justifyContent: "flex-end",
-                        backgroundColor: "rgba(0,0,0,0.4)",
-                    }}
-                >
-                    <View
-                        style={{
-                            backgroundColor: "#fff",
-                            padding: 16,
-                            borderTopLeftRadius: 12,
-                            borderTopRightRadius: 12,
-                        }}
-                    >
-                        <Text style={{fontWeight: "700"}}>
-                            Edit Quantity – {editingItem?.productName}
-                        </Text>
+                <View style={{flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.4)"}}>
+                    <View style={{
+                        backgroundColor: "#fff",
+                        padding: 16,
+                        borderTopLeftRadius: 12,
+                        borderTopRightRadius: 12
+                    }}>
+                        <Text style={{fontWeight: "700"}}>Edit Quantity – {editingItem?.productName}</Text>
 
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                marginTop: 20,
-                            }}
-                        >
+                        <View style={{flexDirection: "row", justifyContent: "center", marginTop: 20}}>
                             <TouchableOpacity
                                 onPress={() =>
-                                    setEditingQty(String(Math.max(1, editingQty - 1)))
+                                    setEditingQty(String(Math.max(1, Number(editingQty) - 1)))
                                 }
-                                style={{
-                                    padding: 12,
-                                    backgroundColor: "#eee",
-                                    borderRadius: 8,
-                                }}
+                                style={{padding: 12, backgroundColor: "#eee", borderRadius: 8}}
                             >
                                 <Text style={{fontSize: 20}}>−</Text>
                             </TouchableOpacity>
@@ -581,36 +438,22 @@ export default function SalesScreen({navigation}) {
                                     borderWidth: 1,
                                     textAlign: "center",
                                     padding: 8,
-                                    borderRadius: 8,
+                                    borderRadius: 8
                                 }}
                                 value={editingQty}
                                 keyboardType="numeric"
-                                onChangeText={(v) =>
-                                    setEditingQty(v.replace(/[^0-9]/g, ""))
-                                }
+                                onChangeText={(v) => setEditingQty(v.replace(/[^0-9]/g, ""))}
                             />
 
                             <TouchableOpacity
-                                onPress={() =>
-                                    setEditingQty(String(Number(editingQty) + 1))
-                                }
-                                style={{
-                                    padding: 12,
-                                    backgroundColor: "#eee",
-                                    borderRadius: 8,
-                                }}
+                                onPress={() => setEditingQty(String(Number(editingQty) + 1))}
+                                style={{padding: 12, backgroundColor: "#eee", borderRadius: 8}}
                             >
                                 <Text style={{fontSize: 20}}>+</Text>
                             </TouchableOpacity>
                         </View>
 
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "space-between",
-                                marginTop: 20,
-                            }}
-                        >
+                        <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 20}}>
                             <TouchableOpacity
                                 onPress={() => {
                                     setEditingModalVisible(false);
@@ -621,7 +464,7 @@ export default function SalesScreen({navigation}) {
                                     padding: 12,
                                     backgroundColor: "#e5e7eb",
                                     borderRadius: 8,
-                                    alignItems: "center",
+                                    alignItems: "center"
                                 }}
                             >
                                 <Text>Cancel</Text>
@@ -634,7 +477,7 @@ export default function SalesScreen({navigation}) {
                                     padding: 12,
                                     backgroundColor: "#059669",
                                     borderRadius: 8,
-                                    alignItems: "center",
+                                    alignItems: "center"
                                 }}
                             >
                                 <Text style={{color: "#fff"}}>Save</Text>

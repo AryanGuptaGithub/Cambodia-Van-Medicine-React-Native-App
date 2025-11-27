@@ -85,7 +85,7 @@ export default function CustomerPicker({visible, onClose, onSelect, customers = 
                     <SectionList
                         ref={sectionListRef}
                         sections={sections}
-                        keyExtractor={(item) => String(item.id)}
+                        keyExtractor={(item) => String(item._id ?? item.id ?? Math.random())}
                         renderItem={({item}) => (
                             <TouchableOpacity
                                 style={styles.row}
@@ -96,7 +96,8 @@ export default function CustomerPicker({visible, onClose, onSelect, customers = 
                                     <Text
                                         style={styles.meta}>{item.agent || ''} • {item.zone || ''} • {item.province || ''}</Text>
                                 </View>
-                                <Text style={styles.idText}>{item.id}</Text>
+                                <Text style={styles.idText}>{item._id ?? item.id}</Text>
+
                             </TouchableOpacity>
                         )}
                         renderSectionHeader={({section: {title}}) => (

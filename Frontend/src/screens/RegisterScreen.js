@@ -4,6 +4,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import {BASE_URL} from '../api/_api';
 
 export default function RegisterScreen({navigation}) {
     const [name, setName] = useState('');
@@ -33,7 +34,7 @@ export default function RegisterScreen({navigation}) {
         };
 
         try {
-            const response = await axios.post('https://sprightlier-deepwater-tanisha.ngrok-free.dev/api/auth/register', user);
+            const response = await axios.post(`${BASE_URL}/auth/register`, user);
             const {token, user: userData} = response.data;
             await AsyncStorage.setItem('token', token);
             await AsyncStorage.setItem('user', JSON.stringify(userData));
