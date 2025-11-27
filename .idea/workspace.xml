@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="332184ee-779d-4907-9472-d79961b6fe90" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/models/Sales.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/models/Sales.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routes/sales.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routes/sales.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/api/_api.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/api/_api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/HomeScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/screens/SalesReturnTotalScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/SalesReturnTotalScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/SalesScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/SalesScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +101,7 @@
       <workItem from="1764042471956" duration="3582000" />
       <workItem from="1764049066833" duration="18256000" />
       <workItem from="1764136181280" duration="15097000" />
-      <workItem from="1764214230740" duration="20885000" />
+      <workItem from="1764214230740" duration="22351000" />
     </task>
     <servers />
   </component>
