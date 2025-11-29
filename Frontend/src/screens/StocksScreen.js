@@ -1,25 +1,39 @@
 // src/screens/StocksScreen.js
-import React, {useContext, useMemo, useState} from 'react';
-import {FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
+import {FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../../components/jsfiles/Header';
 import {_AppContext} from '../context/_AppContext';
+import * as api from '../api/_api';
 
-// dev sample image path (you uploaded)
 const SAMPLE_IMAGE = '/mnt/data/16e1317b-3d59-4f8c-accf-97815479089d.jpg';
 
 export default function StocksScreen({navigation}) {
-    const {products = []} = useContext(_AppContext);
+    const {products, persistProducts} = useContext(_AppContext);
 
     const [query, setQuery] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
-    const [sortBy, setSortBy] = useState('name'); // name | stock_desc | stock_asc | price_desc | price_asc
+    const [sortBy, setSortBy] = useState('name');
+
+    // fetch latest stocks from backend on mount
+    useEffect(() => {
+        (async () => {
+            try {
+                const remoteStocks = await api.fetchStocks();
+                if (Array.isArray(remoteStocks) && remoteStocks.length > 0) {
+                    persistProducts(remoteStocks);  // update context + AsyncStorage
+                }
+            } catch (err) {
+                console.log('Failed to fetch backend stocks:', err.message);
+            }
+        })();
+    }, []);
 
     // derive types for chips
     const types = useMemo(() => {
         const s = new Set();
         (products || []).forEach(p => {
-            if (p && p.type) s.add(String(p.type));
+            if (p?.type) s.add(String(p.type));
         });
         return ['all', ...Array.from(s)];
     }, [products]);
@@ -31,15 +45,13 @@ export default function StocksScreen({navigation}) {
         let out = (products || []).slice();
 
         if (typeFilter !== 'all') {
-            out = out.filter(p => (String(p.type || '').toLowerCase() || '') === String(typeFilter).toLowerCase());
+            out = out.filter(p => String(p.type || '').toLowerCase() === String(typeFilter).toLowerCase());
         }
 
         if (q) {
             out = out.filter(p => {
                 const hay = [p.name, p.type, p.drugLicense, String(p.sellingPrice), String(p.purchasingPrice)]
-                    .filter(Boolean)
-                    .join(' ')
-                    .toLowerCase();
+                    .filter(Boolean).join(' ').toLowerCase();
                 return hay.includes(q);
             });
         }
@@ -170,7 +182,7 @@ export default function StocksScreen({navigation}) {
 
             <FlatList
                 data={filtered}
-                keyExtractor={(i) => String(i.id)}
+                keyExtractor={(i) => String(i._id)}
                 renderItem={renderItem}
                 contentContainerStyle={{padding: 12, paddingBottom: 90}}
                 ListEmptyComponent={<Text style={{padding: 20, color: '#6b7280'}}>No products found</Text>}

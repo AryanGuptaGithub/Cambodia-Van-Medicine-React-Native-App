@@ -1,3 +1,4 @@
+// backend/server.js
 require('dotenv').config();
 require('express-async-errors'); // allows throwing errors in async handlers
 const express = require('express');
@@ -6,13 +7,14 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
+
+// --------  ALl the routes -----------
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const customerRoutes = require('./routes/customers');
 // const orderRoutes = require('./routes/orders');
 const salesRoutes = require('./routes/sales');
-
-
+const stockRoutes = require('./routes/stocks');
 const miscRoutes = require('./routes/misc');
 
 
@@ -26,6 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/sales', salesRoutes)
+app.use("/api/stocks", stockRoutes);
 
 app.use('/api', miscRoutes);
 

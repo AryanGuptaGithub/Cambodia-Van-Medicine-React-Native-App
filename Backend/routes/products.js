@@ -1,3 +1,4 @@
+//  backend/routes/product.js
 const router = require('express').Router();
 const auth = require('../middleware/Auth');  // Re-import the auth middleware
 const ctrl = require('../controllers/productController');

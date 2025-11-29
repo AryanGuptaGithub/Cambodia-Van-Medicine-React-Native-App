@@ -5,12 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="332184ee-779d-4907-9472-d79961b6fe90" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Backend/controllers/stockController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/models/Stock.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/routes/stocks.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/components/jsfiles/ProductPicker.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/components/jsfiles/ProductPicker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/config/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/config/db.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/models/product.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/models/product.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/routes/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routes/products.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/api/_api.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/api/_api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/context/_AppContext.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/HomeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/LoginScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/LoginScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/SalesScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/SalesScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/screens/StocksScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/screens/StocksScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +110,7 @@
       <workItem from="1764049066833" duration="18256000" />
       <workItem from="1764136181280" duration="15097000" />
       <workItem from="1764214230740" duration="22411000" />
-      <workItem from="1764389179771" duration="7737000" />
+      <workItem from="1764389179771" duration="8948000" />
     </task>
     <servers />
   </component>

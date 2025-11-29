@@ -113,6 +113,17 @@ export const AppProvider = ({children}) => {
     // Stock update
     const decrementStock = async (items = []) => {
         if (!items.length) return;
+
+        // Update backend first
+        try {
+            for (const item of items) {
+                await api.removeStock({productId: item.id, quantity: item.quantity, note: 'Sale'});
+            }
+        } catch (err) {
+            console.log('Backend removeStock failed:', err.message);
+        }
+
+        // Then update local state
         const next = products.map(p => {
             const found = items.find(i => String(i.id) === String(p.id));
             if (found) return {...p, stock: Math.max(0, p.stock - found.quantity)};
@@ -123,6 +134,17 @@ export const AppProvider = ({children}) => {
 
     const incrementStock = async (items = []) => {
         if (!items.length) return;
+
+        // Update backend first
+        try {
+            for (const item of items) {
+                await api.addStock({productId: item.id, quantity: item.quantity, note: 'Restock'});
+            }
+        } catch (err) {
+            console.log('Backend addStock failed:', err.message);
+        }
+
+        // Then update local state
         const next = products.map(p => {
             const found = items.find(i => String(i.id) === String(p.id));
             if (found) return {...p, stock: p.stock + found.quantity};
