@@ -14,6 +14,18 @@ export default function HomeScreen({navigation}) {
     const [isSyncing, setIsSyncing] = useState(false);
 
     const sales = Array.isArray(salesHistory) ? salesHistory : [];
+    const customersList = Array.isArray(customers) ? customers : [];
+
+    // Attach customer names to sales
+    const salesWithNames = useMemo(() => {
+        return sales.map((sale) => {
+            const customer = customersList.find(c => String(c._id) === String(sale.customerId));
+            return {
+                ...sale,
+                customerName: customer ? customer.name : 'Unknown Customer',
+            };
+        });
+    }, [sales, customersList]);
 
     // Totals
     const totals = useMemo(() => {
@@ -22,15 +34,15 @@ export default function HomeScreen({navigation}) {
         let totalSalesCount = 0;
         let totalReturnsCount = 0;
 
-        sales.forEach((sale) => {
-            if (sale.greenTotal) {
-                totalSalesAmount += sale.greenTotal;
-                totalSalesCount += 1;
-            }
-            if (sale.returnsAmount) {
-                totalReturnsAmount += sale.returnsAmount;
-                totalReturnsCount += 1;
-            }
+        salesWithNames.forEach((sale) => {
+            const saleAmount = Number(sale.totalAmount || 0);
+            const returnAmount = Number(sale.returnsAmount || 0);
+
+            totalSalesAmount += saleAmount;
+            totalReturnsAmount += returnAmount;
+
+            if (saleAmount > 0) totalSalesCount += 1;
+            if (returnAmount > 0) totalReturnsCount += 1;
         });
 
         return {
@@ -40,9 +52,9 @@ export default function HomeScreen({navigation}) {
             totalReturnsCount,
             netRevenue: totalSalesAmount - totalReturnsAmount,
         };
-    }, [sales]);
+    }, [salesWithNames]);
 
-    // Prepare dynamic graph data (last 7 days)
+    // Sales graph (last 7 days)
     const graphData = useMemo(() => {
         const today = new Date();
         const last7Days = Array.from({length: 7}, (_, i) => {
@@ -52,17 +64,17 @@ export default function HomeScreen({navigation}) {
         }).reverse();
 
         const dataPoints = last7Days.map(day => {
-            const daySales = sales.filter(sale => {
+            const daySales = salesWithNames.filter(sale => {
                 const saleDate = new Date(sale.createdAt);
                 return saleDate.toDateString() === day.toDateString();
             });
-            return daySales.reduce((sum, s) => sum + (s.greenTotal || 0), 0);
+            return daySales.reduce((sum, s) => sum + Number(s.totalAmount || 0), 0);
         });
 
         const labels = last7Days.map(d => d.toLocaleDateString('en-US', {weekday: 'short'}));
 
         return {labels, dataPoints};
-    }, [sales]);
+    }, [salesWithNames]);
 
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#f4f6f9'}}>
@@ -76,10 +88,7 @@ export default function HomeScreen({navigation}) {
             }}>
                 <Text style={{fontSize: 22, fontWeight: '700', color: '#1f2937'}}>Dashboard</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <TouchableOpacity
-                        style={{marginRight: 16}}
-                        onPress={() => navigation.navigate('Notifications')}
-                    >
+                    <TouchableOpacity style={{marginRight: 16}} onPress={() => navigation.navigate('Notifications')}>
                         <View>
                             <Icon name="bell-outline" size={24} color="#4b5563"/>
                             {unreadCount > 0 && (
@@ -134,7 +143,7 @@ export default function HomeScreen({navigation}) {
                     marginHorizontal: 20,
                     marginBottom: 20
                 }}>
-                    <StatsCard label="Customers" value={customers.length} icon="account-group"
+                    <StatsCard label="Customers" value={customersList.length} icon="account-group"
                                onPress={() => navigation.navigate('Customers')}/>
                     <StatsCard label="Products" value={products.length} icon="package-variant"
                                onPress={() => navigation.navigate('Products')}/>

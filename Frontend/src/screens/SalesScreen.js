@@ -1,8 +1,8 @@
+// SalesScreen.js
 import React, {useContext, useEffect, useMemo, useState} from "react";
-import {Alert, FlatList, Keyboard, Modal, ScrollView, Text, TextInput, TouchableOpacity, View,} from "react-native";
+import {Alert, FlatList, Keyboard, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import {_AppContext} from "../context/_AppContext";
 import Header from "../../components/jsfiles/Header";
 import CustomerPicker from "../../components/jsfiles/CustomerPicker";
@@ -49,58 +49,57 @@ export default function SalesScreen({navigation}) {
 
     // ---------------- CALCULATIONS ----------------
     const totals = useMemo(() => {
-        const subtotal = cart.reduce(
-            (sum, item) => sum + item.price * item.quantity,
-            0
-        );
+        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const discount = Number(saleData.discount) || 0;
         const deposit = Number(saleData.deposit) || 0;
         const paidAmount = Number(saleData.paidAmount) || 0;
         const subtotalAfterDiscount = subtotal * (1 - discount / 100);
-        const vatAmount = subtotalAfterDiscount * 0.1;
+        const vatAmount = subtotalAfterDiscount * 0.1; // 10% VAT
         const grandTotal = subtotalAfterDiscount + vatAmount;
         const balance = grandTotal - deposit - paidAmount;
-
         return {subtotal, subtotalAfterDiscount, vatAmount, grandTotal, balance};
     }, [cart, saleData.discount, saleData.deposit, saleData.paidAmount]);
 
     // ---------------- HANDLERS ----------------
     const handleSelectCustomer = (customer) => {
-
-
-        // ✅ Normalize: ensure customer has 'id' field (handle both 'id' and '_id')
+        if (!customer) return;
         const normalizedCustomer = {
-            ...customer,
-            id: customer.id || customer._id
+            _id: customer.id || customer._id,
+            customerName: customer.name || customer.customerName,
         };
-
-
         setSaleData((prev) => ({...prev, customer: normalizedCustomer}));
         setCustomerPickerVisible(false);
     };
 
-    const addProductToCart = (product, qty = 1) => {
-        const id = String(product.id);
-        const quantity = Math.max(1, Number(qty) || 1);
-        const existing = cart.find((p) => p.id === id);
 
+    const addProductToCart = (product, qty = 1) => {
+        if (!product || (!product.id && !product._id) || !product.productName) return;
+
+        const _id = product.id || product._id;
+        const quantity = Math.max(1, Number(qty) || 1);
+
+        const existing = cart.find((p) => p._id === _id);
         if (existing) {
             setCart((prev) =>
                 prev.map((p) =>
-                    p.id === id ? {...p, quantity: p.quantity + quantity} : p
+                    p._id === _id ? {...p, quantity: p.quantity + quantity} : p
                 )
             );
         } else {
             setCart((prev) => [
                 ...prev,
-                {id, productName: product.name, price: Number(product.price), quantity},
+                {
+                    _id,
+                    productName: product.productName || product.name,
+                    price: Number(product.price) || 0,
+                    quantity,
+                },
             ]);
         }
     };
 
-    const removeFromCart = (id) => {
-        setCart((prev) => prev.filter((item) => item.id !== id));
-    };
+
+    const removeFromCart = (_id) => setCart((prev) => prev.filter((item) => item._id !== _id));
 
     const openEditItem = (item) => {
         setEditingItem(item);
@@ -109,67 +108,50 @@ export default function SalesScreen({navigation}) {
     };
 
     const saveEditQty = () => {
-        const newQty = Math.max(1, Number(editingQty));
-        setCart((prev) =>
-            prev.map((item) =>
-                item.id === editingItem.id ? {...item, quantity: newQty} : item
-            )
-        );
+        const newQty = Math.max(1, Number(editingQty) || 1);
+        setCart((prev) => prev.map((item) => (item._id === editingItem._id ? {...item, quantity: newQty} : item)));
         setEditingModalVisible(false);
         setEditingItem(null);
     };
 
     const completeSale = async () => {
-        console.log('=== SALE COMPLETION DEBUG ===');
-        console.log('User:', user);
-        console.log('Customer selected:', saleData.customer);
-        console.log('Customer ID:', saleData.customer?.id);
-        console.log('Cart:', cart);
-
-        if (!user || !(user._id || user.id))
+        if (!user || !(user._id || user.id)) {
             return Alert.alert("Error", "User not loaded. Cannot complete sale.");
+        }
 
-        const customerId = saleData.customer?.id || saleData.customer?._id;
-        if (!saleData.customer || !customerId) {
-            console.log("❌ No customer selected or missing ID");
+        if (!saleData.customer || !(saleData.customer._id || saleData.customer.id)) {
             return Alert.alert("Error", "Please select a customer.");
         }
 
-        if (cart.length === 0) return Alert.alert("Error", "Cart is empty");
+        if (!cart || cart.length === 0) {
+            return Alert.alert("Error", "Cart is empty");
+        }
 
-        const selectedProducts = {};
-        cart.forEach((item) => {
-            selectedProducts[item.id] = {
-                id: item.id,
-                name: item.productName,
-                price: item.price,
-                qty: item.quantity,
-                bonusQty: 0,           // ✅ Can be enhanced to let users input bonus
-                discount: 0,           // ✅ Can be enhanced for per-product discount
-                costPrice: 0,          // ✅ If available from product data
-            };
-        });
+        // Map cart to the format expected by context
+        const selectedProducts = cart.map(item => ({
+            id: item._id,
+            name: item.productName,
+            price: Number(item.price) || 0,
+            qty: Number(item.quantity) || 1,
+        }));
 
-        console.log('Selected Products:', selectedProducts);
+        const selectedCustomer = {
+            id: saleData.customer._id || saleData.customer.id,
+            name: saleData.customer.customerName || saleData.customer.name,
+        };
 
         try {
             await createSale({
-                selectedCustomer: {
-                    ...saleData.customer,
-                    id: customerId
-                },
                 selectedProducts,
+                selectedCustomer,
                 totalPaid: Number(saleData.paidAmount) || 0,
-                totalDue: totals.grandTotal - (Number(saleData.deposit) || 0) - (Number(saleData.paidAmount) || 0),
-                remark: saleData.remark || "",
-                creditDays: Number(saleData.creditDays) || 0,        // ✅ NEW
-                deliveryDate: saleData.deliveryDate || new Date(),   // ✅ NEW
-                discount: Number(saleData.discount) || 0,
+                totalDue: totals.balance,
+                remark: saleData.remark || "No remark",
             });
 
-            Alert.alert("Sale Completed", `Invoice: ${saleData.invoiceNumber}`);
+            Alert.alert("Sale Completed", `Invoice created successfully!`);
 
-            // Reset
+            // Reset sale
             setCart([]);
             setSaleData({
                 customer: null,
@@ -188,6 +170,7 @@ export default function SalesScreen({navigation}) {
         }
     };
 
+
     const openCustomerPicker = () => {
         Keyboard.dismiss();
         setTimeout(() => setCustomerPickerVisible(true), 50);
@@ -198,17 +181,11 @@ export default function SalesScreen({navigation}) {
         setTimeout(() => setProductPickerVisible(true), 50);
     };
 
-    const selectedCustomerName = saleData.customer?.name || "Select Customer";
+    const selectedCustomerName = saleData.customer?.customerName || "Select Customer";
 
-    // ---------------- RENDER ----------------
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: "#f3f4f6"}}>
-            <Header
-                title="Add New Sale"
-                onBack={() => navigation.goBack()}
-                backgroundColor="#16a34a"
-            />
-
+            <Header title="Add New Sale" onBack={() => navigation.goBack()} backgroundColor="#16a34a"/>
             <ScrollView style={{flex: 1, padding: 12}}>
                 {/* Invoice + Customer */}
                 <View style={{backgroundColor: "#fff", padding: 12, borderRadius: 12}}>
@@ -256,33 +233,20 @@ export default function SalesScreen({navigation}) {
                         <FlatList
                             data={cart}
                             scrollEnabled={false}
-                            keyExtractor={(item) => String(item.id)}
+                            keyExtractor={(item) => String(item._id)}
                             renderItem={({item}) => (
-                                <View
-                                    style={{
-                                        marginTop: 10,
-                                        backgroundColor: "#f9fafb",
-                                        padding: 10,
-                                        borderRadius: 8,
-                                    }}
-                                >
+                                <View style={{marginTop: 10, backgroundColor: "#f9fafb", padding: 10, borderRadius: 8}}>
                                     <Text style={{fontWeight: "700"}}>{item.productName}</Text>
-                                    <Text style={{marginTop: 4}}>
-                                        Qty: {item.quantity} × ₹{item.price}
-                                    </Text>
-                                    <Text style={{fontWeight: "600", marginTop: 6}}>
-                                        ₹{(item.price * item.quantity).toFixed(2)}
-                                    </Text>
-                                    <View
-                                        style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 8}}
-                                    >
-                                        <TouchableOpacity
-                                            onPress={() => openEditItem(item)}
-                                            style={{marginRight: 15}}
-                                        >
+                                    <Text style={{marginTop: 4}}>Qty: {item.quantity} × ₹{item.price}</Text>
+                                    <Text style={{
+                                        fontWeight: "600",
+                                        marginTop: 6
+                                    }}>₹{(item.price * item.quantity).toFixed(2)}</Text>
+                                    <View style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 8}}>
+                                        <TouchableOpacity onPress={() => openEditItem(item)} style={{marginRight: 15}}>
                                             <FontAwesome5 name="edit" size={18} color="#059669"/>
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => removeFromCart(item.id)}>
+                                        <TouchableOpacity onPress={() => removeFromCart(item._id)}>
                                             <FontAwesome5 name="trash" size={18} color="#b91c1c"/>
                                         </TouchableOpacity>
                                     </View>
@@ -291,6 +255,9 @@ export default function SalesScreen({navigation}) {
                         />
                     )}
                 </View>
+
+                {/* ORDER SUMMARY + COMPLETE BUTTON */}
+                {/* ... keep your existing code as is ... */}
 
                 {/* ORDER SUMMARY */}
                 <View style={{backgroundColor: "#fff", marginTop: 12, padding: 12, borderRadius: 12}}>
@@ -307,9 +274,7 @@ export default function SalesScreen({navigation}) {
                             style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             keyboardType="numeric"
                             value={saleData.discount}
-                            onChangeText={(v) =>
-                                setSaleData({...saleData, discount: v.replace(/[^0-9.]/g, "")})
-                            }
+                            onChangeText={(v) => setSaleData({...saleData, discount: v.replace(/[^0-9.]/g, "")})}
                         />
                     </View>
 
@@ -324,9 +289,7 @@ export default function SalesScreen({navigation}) {
                             style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             keyboardType="numeric"
                             value={saleData.deposit}
-                            onChangeText={(v) =>
-                                setSaleData({...saleData, deposit: v.replace(/[^0-9.]/g, "")})
-                            }
+                            onChangeText={(v) => setSaleData({...saleData, deposit: v.replace(/[^0-9.]/g, "")})}
                         />
                     </View>
 
@@ -337,9 +300,7 @@ export default function SalesScreen({navigation}) {
                             style={{width: 80, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             keyboardType="numeric"
                             value={saleData.creditDays}
-                            onChangeText={(v) =>
-                                setSaleData({...saleData, creditDays: v.replace(/[^0-9]/g, "")})
-                            }
+                            onChangeText={(v) => setSaleData({...saleData, creditDays: v.replace(/[^0-9]/g, "")})}
                             placeholder="0"
                         />
                     </View>
@@ -394,26 +355,24 @@ export default function SalesScreen({navigation}) {
                             style={{width: 100, borderWidth: 1, padding: 6, textAlign: "right", borderRadius: 8}}
                             value={saleData.paidAmount}
                             keyboardType="numeric"
-                            onChangeText={(v) =>
-                                setSaleData({...saleData, paidAmount: v.replace(/[^0-9.]/g, "")})
-                            }
+                            onChangeText={(v) => setSaleData({...saleData, paidAmount: v.replace(/[^0-9.]/g, "")})}
                         />
                     </View>
 
                     {/* BALANCE */}
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text>Balance</Text>
-                        <Text style={{fontWeight: "700", color: "#b91c1c"}}>
-                            ₹{totals.balance.toFixed(2)}
-                        </Text>
+                        <Text style={{fontWeight: "700", color: "#b91c1c"}}>₹{totals.balance.toFixed(2)}</Text>
                     </View>
 
                     {/* GREEN TOTAL */}
                     <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
                         <Text style={{fontWeight: "700"}}>Grand Total</Text>
-                        <Text style={{fontWeight: "700", color: "#059669", fontSize: 18}}>
-                            ₹{totals.grandTotal.toFixed(2)}
-                        </Text>
+                        <Text style={{
+                            fontWeight: "700",
+                            color: "#059669",
+                            fontSize: 18
+                        }}>₹{totals.grandTotal.toFixed(2)}</Text>
                     </View>
 
                     <TouchableOpacity
@@ -423,13 +382,14 @@ export default function SalesScreen({navigation}) {
                             backgroundColor: "#059669",
                             padding: 14,
                             borderRadius: 12,
-                            alignItems: "center",
+                            alignItems: "center"
                         }}
                     >
                         <Text style={{color: "#fff", fontWeight: "700"}}>Complete Sale</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+
 
             {/* CUSTOMER PICKER */}
             <CustomerPicker
@@ -444,27 +404,31 @@ export default function SalesScreen({navigation}) {
                 visible={productPickerVisible}
                 onClose={() => setProductPickerVisible(false)}
                 products={products}
-                onAddProduct={(product) => addProductToCart(product, 1)}
+                onAddProduct={(product) => {
+                    addProductToCart({
+                        id: product.id || product._id,
+                        productName: product.productName || product.name,
+                        price: Number(product.price) || 0,
+                    }, 1);
+                }}
             />
 
             {/* EDIT QUANTITY MODAL */}
+            {/* Keep your existing modal as is */}
+
             <Modal visible={editingModalVisible} transparent animationType="slide">
                 <View style={{flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.4)"}}>
-                    <View
-                        style={{
-                            backgroundColor: "#fff",
-                            padding: 16,
-                            borderTopLeftRadius: 12,
-                            borderTopRightRadius: 12,
-                        }}
-                    >
+                    <View style={{
+                        backgroundColor: "#fff",
+                        padding: 16,
+                        borderTopLeftRadius: 12,
+                        borderTopRightRadius: 12
+                    }}>
                         <Text style={{fontWeight: "700"}}>Edit Quantity – {editingItem?.productName}</Text>
 
                         <View style={{flexDirection: "row", justifyContent: "center", marginTop: 20}}>
                             <TouchableOpacity
-                                onPress={() =>
-                                    setEditingQty(String(Math.max(1, Number(editingQty) - 1)))
-                                }
+                                onPress={() => setEditingQty(String(Math.max(1, Number(editingQty) - 1)))}
                                 style={{padding: 12, backgroundColor: "#eee", borderRadius: 8}}
                             >
                                 <Text style={{fontSize: 20}}>−</Text>
@@ -477,7 +441,7 @@ export default function SalesScreen({navigation}) {
                                     borderWidth: 1,
                                     textAlign: "center",
                                     padding: 8,
-                                    borderRadius: 8,
+                                    borderRadius: 8
                                 }}
                                 value={editingQty}
                                 keyboardType="numeric"
@@ -501,12 +465,12 @@ export default function SalesScreen({navigation}) {
                                 style={{
                                     width: "48%",
                                     padding: 12,
-                                    backgroundColor: "#e5e7eb",
+                                    backgroundColor: "#ef4444",
                                     borderRadius: 8,
-                                    alignItems: "center",
+                                    alignItems: "center"
                                 }}
                             >
-                                <Text>Cancel</Text>
+                                <Text style={{color: "#fff"}}>Cancel</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -516,7 +480,7 @@ export default function SalesScreen({navigation}) {
                                     padding: 12,
                                     backgroundColor: "#059669",
                                     borderRadius: 8,
-                                    alignItems: "center",
+                                    alignItems: "center"
                                 }}
                             >
                                 <Text style={{color: "#fff"}}>Save</Text>
@@ -525,6 +489,8 @@ export default function SalesScreen({navigation}) {
                     </View>
                 </View>
             </Modal>
+
+
         </SafeAreaView>
     );
 }

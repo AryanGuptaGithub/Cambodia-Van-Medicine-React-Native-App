@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
     Alert,
     Image,
@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {login} from '../api/_api';
+import {_AppContext} from '../context/_AppContext';
+
 
 export default function LoginScreen({navigation}) {
     const [email, setEmail] = useState('');
@@ -21,19 +22,31 @@ export default function LoginScreen({navigation}) {
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
 
+
+    const {login} = useContext(_AppContext);
+
+
     const handleLogin = async () => {
         try {
-            setLoading(true);  // Show loading state
-            const response = await login(email, password);
-            if (response.token) {
-                // Successfully logged in, navigate to Home
-                Alert.alert('Login Successful', 'Welcome back!', [
-                    {text: 'OK', onPress: () => navigation.replace('Home')},
-                ]);
+            setLoading(true);
+
+            const response = await loginApi(email, password); // YOUR API CALL
+
+            if (response.token && response.user) {
+
+                // Save user and token properly
+                await login(response.user, response.token);
+
+                Alert.alert("Login Successful", "Welcome back!");
+
+                // ❌ Do NOT navigate manually.
+                // MainStack will auto-switch to Home when user != null
             }
+
         } catch (error) {
-            setLoading(false);  // Hide loading state
-            Alert.alert('Login Failed', error.message || 'Please try again.');
+            Alert.alert("Login Failed", error.message || "Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
