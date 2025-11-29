@@ -31,6 +31,7 @@ export default function MainStack() {
         return null; // You can return a splash screen here if you want
     }
 
+
     return (
         <Stack.Navigator screenOptions={{headerShown: false}}>
             {/* 🔐 Authentication Screens */}

@@ -11,6 +11,8 @@ export const AppProvider = ({children}) => {
     const [salesHistory, setSalesHistory] = useState([]);
     const [user, setUser] = useState(null);
     const [loadingAuth, setLoadingAuth] = useState(true);
+    const [returnsHistory, setReturnsHistory] = useState([]);
+
 
     // Restore authentication
     useEffect(() => {
@@ -29,15 +31,38 @@ export const AppProvider = ({children}) => {
         })();
     }, []);
 
+
     // Load user's personal sales
     useEffect(() => {
         if (!user) return;
         (async () => {
             try {
                 const mySales = await api.fetchMySales();
+
                 if (Array.isArray(mySales)) {
-                    setSalesHistory(mySales);
-                    await AsyncStorage.setItem('salesHistory', JSON.stringify(mySales));
+                    // NORMALIZE THE DATA - Map _id to productId
+                    const normalizedSales = mySales.map(sale => ({
+                        ...sale,
+                        id: sale._id || sale.id, // Add top-level id
+                        invoiceNumber: sale.invoiceNumber || `INV-${Date.now()}`,
+                        customerName: sale.customerName || 'Unknown Customer',
+                        products: (sale.products || []).map((p) => ({
+                            ...p,
+                            // Map _id to productId for consistency
+                            productId: p.productId || p._id || p.id,
+                            id: p._id || p.id || p.productId, // Also add plain id
+                            productName: p.productName || p.name || 'Unknown Product',
+                            salesQty: p.salesQty || p.quantity || 0,
+                            sellingPrice: p.sellingPrice || p.price || 0,
+                        }))
+                    }));
+
+                    // Debug: log normalized structure
+                    console.log("=== NORMALIZED SALES ===");
+                    console.log(JSON.stringify(normalizedSales[0]?.products[0], null, 2));
+
+                    setSalesHistory(normalizedSales);
+                    await AsyncStorage.setItem('salesHistory', JSON.stringify(normalizedSales));
                 }
             } catch (err) {
                 console.log('Could not fetch my sales from backend:', err.message);
@@ -53,10 +78,22 @@ export const AppProvider = ({children}) => {
     };
 
     const logout = async () => {
-        await AsyncStorage.removeItem("userToken");
-        await AsyncStorage.removeItem("user");
-        setUser(null);
+        try {
+            await AsyncStorage.removeItem('user'); // clear saved user
+            setUser(null); // this triggers MainStack to switch to auth screens
+        } catch (e) {
+            console.log('Error logging out:', e);
+        }
     };
+
+
+    // Persist returns to AsyncStorage
+    const addReturn = async (returnRecord) => {
+        const next = [returnRecord, ...returnsHistory];
+        setReturnsHistory(next);
+        await AsyncStorage.setItem('returnsHistory', JSON.stringify(next));
+    };
+
 
     // LOAD CACHED DATA + SYNC
     useEffect(() => {
@@ -78,7 +115,26 @@ export const AppProvider = ({children}) => {
                                 : [];
                     setProducts(normalized);
                 }
-                if (sh) setSalesHistory(JSON.parse(sh));
+
+                // NORMALIZE CACHED SALES
+                if (sh) {
+                    const cachedSales = JSON.parse(sh);
+                    const normalizedSales = cachedSales.map(sale => ({
+                        ...sale,
+                        id: sale._id || sale.id,
+                        invoiceNumber: sale.invoiceNumber || `INV-${Date.now()}`,
+                        customerName: sale.customerName || 'Unknown Customer',
+                        products: (sale.products || []).map((p) => ({
+                            ...p,
+                            productId: p.productId || p._id || p.id,
+                            id: p._id || p.id || p.productId,
+                            productName: p.productName || p.name || 'Unknown Product',
+                            salesQty: p.salesQty || p.quantity || 0,
+                            sellingPrice: p.sellingPrice || p.price || 0,
+                        }))
+                    }));
+                    setSalesHistory(normalizedSales);
+                }
 
                 // Fetch from backend
                 const remoteCustomers = await api.fetchCustomers();
@@ -106,9 +162,33 @@ export const AppProvider = ({children}) => {
     }, []);
 
     const persistProducts = async (next) => {
-        setProducts(next);
-        await AsyncStorage.setItem('products', JSON.stringify(next));
+        const merged = next.map(newP => {
+            const oldP = products.find(p => String(p._id) === String(newP._id)) || {};
+            return {
+                ...oldP,
+                ...newP,
+                stock: newP.stock !== undefined ? newP.stock : (oldP.stock || 0) // preserve old stock if new one is missing
+            };
+        });
+
+        setProducts(merged);
+        await AsyncStorage.setItem('products', JSON.stringify(merged));
     };
+
+
+    const fetchLatestCustomers = async () => {
+        const data = await api.fetchCustomers();
+        setCustomers(data);
+        await AsyncStorage.setItem('customers', JSON.stringify(data));
+    };
+
+    const fetchLatestProducts = async () => {
+        const data = await api.fetchProducts();
+        const normalized = Array.isArray(data) ? data : data?.products || data?.data || [];
+        setProducts(normalized);
+        await AsyncStorage.setItem('products', JSON.stringify(normalized));
+    };
+
 
     // Stock update
     const decrementStock = async (items = []) => {
@@ -262,7 +342,11 @@ export const AppProvider = ({children}) => {
                 addCustomer,
                 decrementStock,
                 incrementStock,
-                createSale
+                createSale,
+                persistProducts,
+                addReturn,
+                fetchLatestCustomers,
+                fetchLatestProducts
             }}
         >
             {children}

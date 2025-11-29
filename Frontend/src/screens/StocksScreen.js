@@ -6,7 +6,8 @@ import Header from '../../components/jsfiles/Header';
 import {_AppContext} from '../context/_AppContext';
 import * as api from '../api/_api';
 
-const SAMPLE_IMAGE = '/mnt/data/16e1317b-3d59-4f8c-accf-97815479089d.jpg';
+
+const SAMPLE_IMAGE = 'https://cdn-icons-png.flaticon.com/512/9098/9098442.png';
 
 export default function StocksScreen({navigation}) {
     const {products, persistProducts} = useContext(_AppContext);
@@ -85,6 +86,10 @@ export default function StocksScreen({navigation}) {
     }, [products]);
 
     const renderItem = ({item}) => {
+
+        console.log('Product item:', item);
+
+
         const stock = Number(item.stock) || 0;
         const low = stock <= LOW_STOCK_THRESHOLD;
 
@@ -94,13 +99,15 @@ export default function StocksScreen({navigation}) {
                     source={item.image ? {uri: item.image} : {uri: SAMPLE_IMAGE}}
                     style={styles.thumb}
                 />
-                <View style={{flex: 1, marginLeft: 10}}>
-                    <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
+                <View style={{flex: 1, marginLeft: 10, maxWidth: '65%'}}>
+                    <Text style={styles.name} numberOfLines={2}>{item.name || item.productName}</Text>
                     <Text style={styles.meta}>
                         {item.type ? `${item.type} • ` : ''}
                         License: {item.drugLicense || '—'}
                     </Text>
-                    <Text style={styles.small}>Valid: {item.validity || '—'}</Text>
+                    <Text style={styles.small}>
+                        Valid: {item.licenseValidityDate ? new Date(item.licenseValidityDate).toLocaleDateString() : '—'}
+                    </Text>
                 </View>
 
                 <View style={{alignItems: 'flex-end'}}>

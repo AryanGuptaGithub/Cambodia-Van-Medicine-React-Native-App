@@ -14,6 +14,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {_AppContext} from '../context/_AppContext';
+import * as api from '../api/_api';
 
 
 export default function LoginScreen({navigation}) {
@@ -30,17 +31,17 @@ export default function LoginScreen({navigation}) {
         try {
             setLoading(true);
 
-            const response = await loginApi(email, password); // YOUR API CALL
+            // Make the actual API call
+            const response = await api.login(email, password); // <-- replace with your real API function
 
-            if (response.token && response.user) {
-
-                // Save user and token properly
+            if (response?.token && response?.user) {
+                // Save user and token via context
                 await login(response.user, response.token);
 
                 Alert.alert("Login Successful", "Welcome back!");
-
-                // ❌ Do NOT navigate manually.
-                // MainStack will auto-switch to Home when user != null
+                // ❌ Do NOT navigate manually. MainStack auto-switches when user != null
+            } else {
+                Alert.alert("Login Failed", "Invalid credentials");
             }
 
         } catch (error) {
@@ -49,6 +50,7 @@ export default function LoginScreen({navigation}) {
             setLoading(false);
         }
     };
+
 
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#f4f6f9'}}>

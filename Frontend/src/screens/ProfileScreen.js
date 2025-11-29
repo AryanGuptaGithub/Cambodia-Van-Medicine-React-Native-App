@@ -24,6 +24,7 @@ export default function ProfileScreen({navigation}) {
     });
 
     const [darkMode, setDarkMode] = useState(false);
+    const {logout} = useContext(_AppContext);
 
     useEffect(() => {
         // Try to load real user from AsyncStorage if available
@@ -44,22 +45,10 @@ export default function ProfileScreen({navigation}) {
         })();
     }, []);
 
-    const onLogout = async () => {
+    const onLogout = () => {
         Alert.alert('Logout', 'Are you sure you want to logout?', [
             {text: 'Cancel', style: 'cancel'},
-            {
-                text: 'Logout',
-                style: 'destructive',
-                onPress: async () => {
-                    await AsyncStorage.removeItem('user');
-
-                    // Reset navigation and go to Login
-                    navigation.reset({
-                        index: 0,
-                        routes: [{name: 'Login'}],
-                    });
-                },
-            },
+            {text: 'Logout', style: 'destructive', onPress: logout},
         ]);
     };
 
